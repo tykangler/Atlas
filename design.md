@@ -7,12 +7,7 @@ relationships to each other. Assuming we have entities "Zeus", "Poseidon", and "
 will reveal that he is part of the category "Greek Gods", along with "Poseidon." It will also reveal that 
 "Zeus" and "Poseidon" are brothers. 
 
-```
-"Poseidon" ---Is a member of--- "Greek Gods" ---Is a member of--- "Zeus"
-   |----------------------------are brothers-------------------------|  
-```
-
 ```mermaid
 flowchart
-   id1((Poseidon)) --- id2((Greek Gods)) --- id3((Zeus));
+   ((Poseidon)) --- ((Greek Gods)) --- ((Zeus));
 ```
