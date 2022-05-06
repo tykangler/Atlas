@@ -11,3 +11,7 @@ will reveal that he is part of the category "Greek Gods", along with "Poseidon."
 "Poseidon" ---Is a member of--- "Greek Gods" ---Is a member of--- "Zeus"
    |----------------------------are brothers-------------------------|  
 ```
+
+```mermaid
+id1((Poseidon)) --- id2((Greek Gods)) --- id3((Zeus))
+```
