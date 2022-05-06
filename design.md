@@ -9,5 +9,6 @@ will reveal that he is part of the category "Greek Gods", along with "Poseidon."
 
 ```mermaid
 flowchart LR
-   P((Poseidon)) --- G((Greek Gods)) --- Z((Zeus));
+   P((Poseidon))---|Is a member of|G((Greek Gods))---|Is a member of|Z((Zeus));
+   P---|Brothers|Z
 ```
