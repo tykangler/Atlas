@@ -13,6 +13,6 @@ will reveal that he is part of the category "Greek Gods", along with "Poseidon."
 ```
 
 ```mermaid
-flowchart example_graph
+flowchart ExampleGraph
 id1((Poseidon)) --- id2((Greek Gods)) --- id3((Zeus))
 ```
