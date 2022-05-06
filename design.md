@@ -8,6 +8,6 @@ will reveal that he is part of the category "Greek Gods", along with "Poseidon."
 "Zeus" and "Poseidon" are brothers. 
 
 ```mermaid
-flowchart
-   ((Poseidon)) --- ((Greek Gods)) --- ((Zeus));
+flowchart LR
+   P((Poseidon)) --- G((Greek Gods)) --- Z((Zeus));
 ```
