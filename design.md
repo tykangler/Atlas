@@ -91,6 +91,18 @@ public class Entity {
    string definition;
    ICollection<Relationship> relations; // storing both incoming and outgoing
 }
+
+// or
+
+public abstract class Entity {
+   // ...
+}
+
+public class BookEntity : Entity {
+   string name;
+   string definition;
+   ICollection<Relationship> relations;
+}
 ```
 
 ### Relationships
@@ -127,13 +139,55 @@ approach avoids this overhead, but must implement more complex logic for queries
 
 ### Language Model
 
-#### Relationship Finding
-
 Sentences are complex. This may be most complex part. Atlas must parse sentences to retrieve
 a "from" entity, a "to" entity, and their relationship. It must also be able to disregard 
 sentences that contain both the "from" and "to" entities, but has an irrelevant relationship.
 In the wiki article, "MultiGraph", the sentence "A multigraph is different from a hypergraph."
 The two entities are "multigraph" and "hypergraph", but the relationship is "different." 
-We might decide not to include this edge at all. 
+We might decide not to include this edge at all.  
+
+#### Characteristics of Sentences
+
+* Each sentence specifies the subject at least once. Sentences may have more than one subject
+connected by clauses, or the subject may encompass multiple entities. "John and Ann went to
+the store." "John went to the store, and Ann went to the park".
+
+* Object may not be specified. "She sang beautifully." "He worked hard."
+
+* Subject can be replaced by a pronoun, "he", "she". In this case, the subject is implicitly
+defined depending on the context. If the prior sentences talked about "Jane Austen", 
+the "she" in the following sentence is referencing Jane Austen. 
+
+* Independent Clauses and dependent clauses
+
+#### First steps/Basic parsing
+
+We will need to implement a grammar model, and parse through sentences using this model to 
+identify at least a subject, a verb, and a possible object. If there is no object, we can
+throw the sentence, and assume there is no relationship. The verb will represent the
+relationship. We'll have to identify whether the sentence is passive or active, as that can
+affect the id of V<sub>from</sub> and V<sub>to</sub>. 
+
+The initial idea is to create a context free grammar and a language parser to accompany,
+but maybe we don't need something that complex. Knowing the subject and object makes things
+simpler. We can identify stop words, prepositional words, and identify relationships
+with the words around subject and object. We can implement a hidden markov model
+
+#### Relationship Finding
+
+**Keywords**: We can define **keywords** for each relationship type. For example, the "member" relationship
+can have keywords: "is an/a", "is a type of", "was an". We can take what's on the left, define 
+as "from", and what's on the right, define as "to". This will work for **simple sentences**
+and will require finding the relevant keywords manually.
+
+**Boolean Clauses**: Should be able to recognize "and"s, "or"s, and "not"s. The exact word used
+may differ. "Northanger Abbey is a coming-of-age novel **and** a satire of Gothic novels".
+
+**Info boxes**: Wiki's info boxes are an easy/quick way to parse information. In the entry for 
+"Northanger Abbey", we can see it's followed by "Persuasion." And that relationship can be consistently
+and easily parsed. 
+
+**Implicitly matching entities**: In many cases, V<sub>from</sub>, or V<sub>to</sub> may
+not be explicitly mentioned in the same sentence. 
 
 #### Definition Finding
