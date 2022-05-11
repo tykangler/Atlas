@@ -168,12 +168,19 @@ throw the sentence, and assume there is no relationship. The verb will represent
 relationship. We'll have to identify whether the sentence is passive or active, as that can
 affect the id of V<sub>from</sub> and V<sub>to</sub>. 
 
-The initial idea is to create a context free grammar and a language parser to accompany,
-but maybe we don't need something that complex. Knowing the subject and object makes things
-simpler. We can identify stop words, prepositional words, and identify relationships
-with the words around subject and object. We can implement a hidden markov model
+Initial idea was to create a context free grammar and a language parser to accompany,
+but maybe that's too complex. Knowing the subject and object makes things
+simpler. A context free grammar would require having a large list of terminals.
+We can identify stop words, prepositional words, and identify relationships
+with the words around subject and object using our pre-defined relationships. Terminal words
+would essentially be relationships, objects/targets, and subjects.
 
-#### Relationship Finding
+By starting with pre-defined relationship types, we can also just look for those words 
+instead of id'ing every part of the sentence.  
+
+First implement this in Jupyter Lab.
+
+#### Capabilities
 
 **Keywords**: We can define **keywords** for each relationship type. For example, the "member" relationship
 can have keywords: "is an/a", "is a type of", "was an". We can take what's on the left, define 
@@ -184,10 +191,26 @@ and will require finding the relevant keywords manually.
 may differ. "Northanger Abbey is a coming-of-age novel **and** a satire of Gothic novels".
 
 **Info boxes**: Wiki's info boxes are an easy/quick way to parse information. In the entry for 
-"Northanger Abbey", we can see it's followed by "Persuasion." And that relationship can be consistently
+"Northanger Abbey", we can see it's followed by "Persuasion." Similar relationships can be consistently
 and easily parsed. 
 
 **Implicitly matching entities**: In many cases, V<sub>from</sub>, or V<sub>to</sub> may
-not be explicitly mentioned in the same sentence. 
+not be explicitly mentioned in the same sentence. Instead a pronoun is used (he/she/it). 
+We need to **analyze context** to find the meaning of the pronoun. If it is a relevant entity, 
+further analyze the sentence.
 
-#### Definition Finding
+**Dependent Clauses**: the information may be present in a dependent clause beginning the sentence.
+"Born in Tatooine, Luke Skywalker ...". This sentence establishes a relationship between Luke
+Skywalker and Tatooine. Context should be determined to find subject. For example,
+"Born in Tatooine, He ..." should also match Luke Skywalker and Tatooine. 
+
+#### Context Matching
+
+If pronoun, or indirect subject/object, found, then check preceding sentences for subject match.
+Indirect objects can be adding all nodes first with associated URLs, and checking whether
+the object has a link to an existing node. 
+
+For indirect subjects, if 'he/she/they/him/her/them' check for person(s). If 'it/they/them' check 
+for things(s). Should be simple to check if object or person by looking at wiki categories.
+
+If referencing a subject that isn't the article's subject, ignore.
