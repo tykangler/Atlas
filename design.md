@@ -214,3 +214,7 @@ For indirect subjects, if 'he/she/they/him/her/them' check for person(s). If 'it
 for things(s). Should be simple to check if object or person by looking at wiki categories.
 
 If referencing a subject that isn't the article's subject, ignore.
+
+#### Simplifying expressions
+
+Brothers -- Son -> Uncle
