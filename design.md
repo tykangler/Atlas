@@ -43,17 +43,26 @@ we will search for **best match**.
     
 ### Best Match
 
-In the case where the entity is concrete, but not a wiki link, find the best matching entity with an acceptable match score. Two ways to approach this:
+In the case where the entity is concrete, but not a wiki link, find the best matching entity with an acceptable match score. If no entity is found, then
+we should either discard, or index anyways. We should only keep entities that have a corresponding wiki article, otherwise we will be indexing random 
+data. In the sentence "Tom ate Jim's fish", we would index "Jim's fish". We don't want that. Some indexing concerns.
 
 #### Index all entities beforehand
 
 * Make 2 passes through each article.
 * Pass 1: Grab all wiki links and index entities
 * Pass 2: Read through text, and index relationships.
-* If indefinite entity found, search in model and find best match. 
+* Search in model and find best match. 
+* If not found, then discard. 
 
 * **Pros**:
-
+    * All concrete entities have a corresponding article in Wikipedia.
+    * No ambiguity in whether two entities are the same. 
+    * Only keep defined entities.
+    
+* **Cons**:
+    * Make two passes
+    * Would have to store copy of text so that it can be revisited once entities are added (memory inefficient).
 
 #### Greedily index any entity encountered
 
@@ -61,17 +70,37 @@ In the case where the entity is concrete, but not a wiki link, find the best mat
 * Index wiki links as entities and their corresponding relationships.
 * If indefinite entity found, then search in model for best match. If not found, then index indefinite entity.
 * Once wiki link found, search the model for best match and mark entity as concrete. 
+* At the end, remove all entities that don't have a corresponding wiki article.
+
+* **Pros**:
+    * Will be making 1 pass through each article. Clean pipeline. 
+    * Can discard text right after using. 
+    * Easily parallelizable
+* **Cons**:
+    * ~~Chance of indexing duplicate entities.~~ No chance of this since we are only indexing entities with wiki articles. 
+    * Have to make another pass through model to clean up entities. 
+    * Will be storing non-relevant entities temporarily. 
+    
+### Decision
+
+Go with greedily indexing method. Either way we will have to temporarily store information, and make an extra pass. It's a matter of whether we want to store processed data or raw data. Let's
+store processed data. 
 
 ### Data Processing + Parsing
+
 Atlas will be using Wikipedia data dumps as its data source. The data will be in the `wikitext` format. So, we need to parse and clean text, retaining only
 relevant information such as outgoing links. This text will be the basis for the langugage model. 
 Because the data dumps are large, we will extract in chunks, clean and feed those chunks into the language model, then work on extracting and cleaning the 
 next chunk. This will work in parallel.
 
 ### Output
-   
+
+Output can be in the form of paragraphs or graph model. Should offer both options. Should also offer more information about the queried entities, as well as links and relationships.
+Should also user to find other relationships. Overall graph model should be visible as well. 
 
 ### Relationship Querying
+
+Relationships are queried for closest path. Also offer other paths. Should also allow querying by entity + relationship to get resulting entity.
 
 ## High-Level Design
 
@@ -80,13 +109,16 @@ an interpreter will take in user input and query the model to return a response 
 
 This project will require:
 * **Data parser**: To iterate through data dumps, extract articles, expand templates, clean text
-* **Language parser**: To take extracted + cleaned articles/text and parse entities and   
-* **Entity + Relationship indexer**: to index entities and corresponding relationships
-
-## Capabilities
+* **Language parser**: To take extracted + cleaned articles/text and parse entities and relationships
+* **Entity + Relationship indexer**: to index entities and corresponding relationships, handle entity best matches, and cleanup
+* **UI**: Takes in user input and queries the indexed model
+* 
 
 ## Data Model
 
-## System Design
+Can either store data in hash graph to support fast lookup in memory, or use a graph database like neo4j that supports shortest path lookup. Persist data after creating the model
+so that lookup is quick.
 
-## 
+We can run neo4j embedded.
+
+## System Design
