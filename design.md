@@ -5,7 +5,7 @@
 Atlas is a project that, in a way similar to Google's Knowledge Graph, will map knowledge "entities" and their
 relationships to each other. Assuming we have entities "Zeus", "Poseidon", and "Greek Gods", a query on Zeus
 will reveal that he is part of the category "Greek Gods", along with "Poseidon." It will also reveal that 
-"Zeus" and "Poseidon" are brothers, and that he gave birth to Heracles, who is a demigod. If we wanted to reveal the relationship betwen Theseus and Heracles, we can see that they're both demigods. And if we wanted to see the relationship between Zeus and Theseus, we can see that Theseus is Zeus' brother's (Poseidon) son. In other words, he is his uncle. \
+"Zeus" and "Poseidon" are brothers, and that he gave birth to Heracles, who is a demigod. If we wanted to reveal the relationship betwen Theseus and Heracles, we can see that they're both demigods. And if we wanted to see the relationship between Zeus and Theseus, we can see that Theseus is Zeus' brother's (Poseidon) son (uncle) \
 We should be able to print this information in both paragraph form, and graph form. For example, "Zeus is a greek god, and is Theseus' uncle."
 
 ```mermaid
@@ -18,203 +18,75 @@ flowchart LR
 ```
 
 ## Design Considerations
-* **Many Relationship Types:** \
-   We will need to model many different kinds of relationships, 
-   and these relationship types may be **mutually exclusive**, depending on the entity type. 
-   For example, Poseidon can be classified as a **Person** entity. 
-   He may have family relationships, 'has killed' relationships, 'has invented' relationships. 
-   But he won't have a 'was written by' relationship, something that might be 
-   exclusive to books/music/scores. Relationship types may also be **shared** between entity 
-   types. The "is a member of" relationship will most likely be a part of all entity types, 
-   though the exact label may change.
 
-   These relationships can be concrete/hard-coded, but they could also consist of only 
-   labels/strings to be more flexible.
+### Entity Types: 
 
-* **Many Entity Types**: \
-   We should be able to recognize different types of entities (Books, People, Music, 
-   Movies, Characters, Places). These entities will have different characteristics, and 
-   should be treated as separate classifications.
+Entities should have an associating supported type to structure knowledge better.
 
-* **Multiple relationships**: \
-   We can recognize more than one type of relationship between entity A and entity B. 
-   i.e. The relationship between Luke Skywalker and Darth Vader is complex. Darth Vader is 
-   not just Luke's father, but also his main antagonist. Luke also killed Darth Vader.
+### Multiple relationships
 
-   Relationships may also be directed, or undirected. The 'member' relationship is useful
-   as an undirected relationship in case  we'd want to list all members of a category,
-   or see whether an entity is part of a category. The 'father-son' relationship should
-   be a directed relationship to see who is the father and who is the son. However, if we want
-   to find the father from the son, this will be difficult. We could store parent along with
-   children edges.
+Entities should be capable of holding multiple relationships.
 
-* **Language Model**: \
-   We will need to parse through text to identify the relationship between two entities. 
-   Given a fragment like "Originally a farmer on Tatooine living with his uncle and aunt", in an
-   article about "Luke Skywalker", We should recognize that Luke Skywalker lived on Tatooine.
-   Looking at info boxes could make this simpler. 
+### Directional, backtrack-able
 
-   Should also recognize when a sentence is not relevant to the article. The sentence 
-   "He places him in his X-wing starfighter, which is then flown to Tatooine by R2-D2" is
-   irrelevant.
-
-* **Data Processing**: \
-   Main data source will be wikipedia's data dumps. These files are very large, so we should
-   start with a partition to build a small representation. After testing, expand to 
-   other partitions. Could also download, and unzip online, building one sub-component
-   at a time, serializing the data we need, and throwing away the rest.
-
-* **Output**: \
-   Should be able to output in both paragraph form, and relationship form. Maybe later, 
-   I'll expand to include a graph visualized form. 
-
-* **Relationship Querying:** \
-   When querying two entities for relationship data, should first find the shortest connection
-   possible. If the user wants, find the next shortest connection. So and so forth. When querying
-   using an entity and a relationship (who is Luke's mother?), the relationship may have different
-   names in the system. Should find either the closest matching one, or say no relationship. 
-
-## Implementation
-
-Atlas will use a multigraph model, with nodes set to knowledge entities, and edges set 
-to relationships.
-
-### Entities
-
-Entites are nodes. They should convey name, and type, and definition. Each entity should be able 
-to store incoming and outgoing edges.
-
-```csharp
-public class Entity {
-   EntityType type;
-   string name;
-   string definition;
-   ICollection<Relationship> relations; // storing both incoming and outgoing
-}
-
-// or
-
-public abstract class Entity {
-   // ...
-}
-
-public class BookEntity : Entity {
-   string name;
-   string definition;
-   ICollection<Relationship> relations;
-}
-```
-
-### Relationships
-
-Relationships are edges. They should allow traversal from v1 to v2 and the reverse, v2 to v1. 
-Because we need to maintain multiple edges between two nodes, we can have either the entity 
-carry the multiple edges, or have a list representing relationships in a single edge class.
-
-```csharp
-public class Relationship {
-   ICollection<RelationshipType> relations;
-   Entity parent;
-   Entity child;
-}
-
-// or 
-
-public class Entity {
-   ICollection<Relationship> relations; // this will be here anyways
-   // but in addition to storing unique edges, will also store 
-   // same edges.
-   // ...
-}
-
-public class Relationship {
-   Entity parent;
-   Entity child;
-}
-```
-
-The first approach is cleaner in that all relations between v1 and v2 are stored in one place.
-It however incurs overhead in that it has to store another collection. The second
-approach avoids this overhead, but must implement more complex logic for queries.
+Relationships should be directional to indicate relationships such as parent-child. For example, "Suzanne Collins wrote The Hunger Games" should
+be modeled as `Suzanne Collins --wrote--> The Hunger Games`. If we want to find the writer of the Hunger Games, we should be able to backtrack
+the relationship, so we can extend the model further: `The Hunger Games --was written by--> Suzanne Collins`. This means the number of edges is
+2x the number of relationships. Consider memory.
 
 ### Language Model
 
-Sentences are complex. This may be most complex part. Atlas must parse sentences to retrieve
-a "from" entity, a "to" entity, and their relationship. It must also be able to disregard 
-sentences that contain both the "from" and "to" entities, but has an irrelevant relationship.
-In the wiki article, "MultiGraph", the sentence "A multigraph is different from a hypergraph."
-The two entities are "multigraph" and "hypergraph", but the relationship is "different." 
-We might decide not to include this edge at all.  
+The language parser should be able to extract the entities and relationships between entities in text. In the text "Suzanne Collins wrote the Hunger Games", 
+the entities are "Suzanne Collins", and "The Hunger Games." The relationship is a "write" relationship. Ideally, the entities will be either the article
+subject or a wiki link. In cases where it's a pronoun, the pronoun should be resolved to a concrete entity. If the entity is concrete, but not a wiki link,
+we will search for **best match**. 
+    
+### Best Match
 
-#### Characteristics of Sentences
+In the case where the entity is concrete, but not a wiki link, find the best matching entity with an acceptable match score. Two ways to approach this:
 
-* Each sentence specifies the subject at least once. Sentences may have more than one subject
-connected by clauses, or the subject may encompass multiple entities. "John and Ann went to
-the store." "John went to the store, and Ann went to the park".
+#### Index all entities beforehand
 
-* Object may not be specified. "She sang beautifully." "He worked hard."
+* Make 2 passes through each article.
+* Pass 1: Grab all wiki links and index entities
+* Pass 2: Read through text, and index relationships.
+* If indefinite entity found, search in model and find best match. 
 
-* Subject can be replaced by a pronoun, "he", "she". In this case, the subject is implicitly
-defined depending on the context. If the prior sentences talked about "Jane Austen", 
-the "she" in the following sentence is referencing Jane Austen. 
+* **Pros**:
 
-* Independent Clauses and dependent clauses
 
-#### First steps/Basic parsing
+#### Greedily index any entity encountered
 
-We will need to implement a grammar model, and parse through sentences using this model to 
-identify at least a subject, a verb, and a possible object. If there is no object, we can
-throw the sentence, and assume there is no relationship. The verb will represent the
-relationship. We'll have to identify whether the sentence is passive or active, as that can
-affect the id of V<sub>from</sub> and V<sub>to</sub>. 
+* Make 1 pass through each article.
+* Index wiki links as entities and their corresponding relationships.
+* If indefinite entity found, then search in model for best match. If not found, then index indefinite entity.
+* Once wiki link found, search the model for best match and mark entity as concrete. 
 
-Initial idea was to create a context free grammar and a language parser to accompany,
-but maybe that's too complex. Knowing the subject and object makes things
-simpler. A context free grammar would require having a large list of terminals.
-We can identify stop words, prepositional words, and identify relationships
-with the words around subject and object using our pre-defined relationships. Terminal words
-would essentially be relationships, objects/targets, and subjects.
+### Data Processing + Parsing
+Atlas will be using Wikipedia data dumps as its data source. The data will be in the `wikitext` format. So, we need to parse and clean text, retaining only
+relevant information such as outgoing links. This text will be the basis for the langugage model. 
+Because the data dumps are large, we will extract in chunks, clean and feed those chunks into the language model, then work on extracting and cleaning the 
+next chunk. This will work in parallel.
 
-By starting with pre-defined relationship types, we can also just look for those words 
-instead of id'ing every part of the sentence.  
+### Output
+   
 
-First implement this in Jupyter Lab.
+### Relationship Querying
 
-#### Capabilities
+## High-Level Design
 
-**Keywords**: We can define **keywords** for each relationship type. For example, the "member" relationship
-can have keywords: "is an/a", "is a type of", "was an". We can take what's on the left, define 
-as "from", and what's on the right, define as "to". This will work for **simple sentences**
-and will require finding the relevant keywords manually.
+This project will make a single pass through wikipedia data dumps to create a graph model of all relationships and entities in wikipedia. Once a model is created,
+an interpreter will take in user input and query the model to return a response to the user. 
 
-**Boolean Clauses**: Should be able to recognize "and"s, "or"s, and "not"s. The exact word used
-may differ. "Northanger Abbey is a coming-of-age novel **and** a satire of Gothic novels".
+This project will require:
+* **Data parser**: To iterate through data dumps, extract articles, expand templates, clean text
+* **Language parser**: To take extracted + cleaned articles/text and parse entities and   
+* **Entity + Relationship indexer**: to index entities and corresponding relationships
 
-**Info boxes**: Wiki's info boxes are an easy/quick way to parse information. In the entry for 
-"Northanger Abbey", we can see it's followed by "Persuasion." Similar relationships can be consistently
-and easily parsed. 
+## Capabilities
 
-**Implicitly matching entities**: In many cases, V<sub>from</sub>, or V<sub>to</sub> may
-not be explicitly mentioned in the same sentence. Instead a pronoun is used (he/she/it). 
-We need to **analyze context** to find the meaning of the pronoun. If it is a relevant entity, 
-further analyze the sentence.
+## Data Model
 
-**Dependent Clauses**: the information may be present in a dependent clause beginning the sentence.
-"Born in Tatooine, Luke Skywalker ...". This sentence establishes a relationship between Luke
-Skywalker and Tatooine. Context should be determined to find subject. For example,
-"Born in Tatooine, He ..." should also match Luke Skywalker and Tatooine. 
+## System Design
 
-#### Context Matching
-
-If pronoun, or indirect subject/object, found, then check preceding sentences for subject match.
-Indirect objects can be adding all nodes first with associated URLs, and checking whether
-the object has a link to an existing node. 
-
-For indirect subjects, if 'he/she/they/him/her/them' check for person(s). If 'it/they/them' check 
-for things(s). Should be simple to check if object or person by looking at wiki categories.
-
-If referencing a subject that isn't the article's subject, ignore.
-
-#### Simplifying expressions
-
-Brothers -- Son -> Uncle
+## 
