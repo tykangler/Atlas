@@ -112,13 +112,22 @@ This project will require:
 * **Language parser**: To take extracted + cleaned articles/text and parse entities and relationships
 * **Entity + Relationship indexer**: to index entities and corresponding relationships, handle entity best matches, and cleanup
 * **UI**: Takes in user input and queries the indexed model
-* 
+* **Database**: Persists data 
+
+When the program starts for the first time, the data parser will read in downloaded data dumps and using the downloaded index files, will unzip
+by chunk and parse the unzipped chunk. The chunk will then be sent to the language parser via a FIFO queue, and the data parser will 
+work on the next chunk. The language parser will read in data from the shared FIFO queue, and find entities + relationships. It will 
+resolve pronouns by calling a python script. This will probably be the bottleneck. The parsed data will be indexed via observers. 
 
 ## Data Model
 
 Can either store data in hash graph to support fast lookup in memory, or use a graph database like neo4j that supports shortest path lookup. Persist data after creating the model
 so that lookup is quick.
 
-We can run neo4j embedded.
+Can't use neo4j embedded with .net, so let's use just a simple file that we'll load into memory. 
 
-## System Design
+## Technology
+
+Must use Python for language parsing. Everything else will be in C#. 
+To run interop between python and C#, use named pipes (FIFO) with a Python server and C sharp client. Or could do the other way around, doesn't matter. Named
+pipes support bi-directional communication. Let's do C sharp server because it will be accepting data, for semantics.
