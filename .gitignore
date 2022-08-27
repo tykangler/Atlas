@@ -14,6 +14,7 @@ dumps/
 *.suo
 *.user
 *.sln.docstates
+.vscode
 
 # Build results
 

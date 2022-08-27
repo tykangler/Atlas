@@ -112,12 +112,12 @@ This project will require:
 * **Language parser**: To take extracted + cleaned articles/text and parse entities and relationships
 * **Entity + Relationship indexer**: to index entities and corresponding relationships, handle entity best matches, and cleanup
 * **UI**: Takes in user input and queries the indexed model
-* **Database**: Persists data 
+* **Data persistance**: Flat file or database 
 
 When the program starts for the first time, the data parser will read in downloaded data dumps and using the downloaded index files, will unzip
 by chunk and parse the unzipped chunk. The chunk will then be sent to the language parser via a FIFO queue, and the data parser will 
 work on the next chunk. The language parser will read in data from the shared FIFO queue, and find entities + relationships. It will 
-resolve pronouns by calling a python script. This will probably be the bottleneck. The parsed data will be indexed via observers. 
+resolve pronouns by calling a python script. This will probably be the bottleneck. The parsed data will be indexed via observers in the Indexer.
 
 ## Data Model
 

@@ -1,0 +1,1 @@
+namespace Atlas.Core.Wiki;
