@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Core", "Atlas.Core\Atlas.Core.csproj", "{B561AEB9-381C-4361-84E8-F441FCE59A61}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Infrastructure", "Atlas.Infrastructure\Atlas.Infrastructure.csproj", "{8DB599D1-DA18-4978-9DA4-E9ECA7DFF267}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Core.Tests", "Atlas.Core.Tests\Atlas.Core.Tests.csproj", "{3C002C58-6991-4A36-861D-F4E3E023B969}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{646FE635-D73F-4CB1-886C-42AF26A1F5F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +28,12 @@ Global
 		{8DB599D1-DA18-4978-9DA4-E9ECA7DFF267}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DB599D1-DA18-4978-9DA4-E9ECA7DFF267}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DB599D1-DA18-4978-9DA4-E9ECA7DFF267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C002C58-6991-4A36-861D-F4E3E023B969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C002C58-6991-4A36-861D-F4E3E023B969}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C002C58-6991-4A36-861D-F4E3E023B969}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C002C58-6991-4A36-861D-F4E3E023B969}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3C002C58-6991-4A36-861D-F4E3E023B969} = {646FE635-D73F-4CB1-886C-42AF26A1F5F3}
 	EndGlobalSection
 EndGlobal
