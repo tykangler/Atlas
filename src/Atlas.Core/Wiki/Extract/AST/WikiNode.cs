@@ -11,7 +11,7 @@ public abstract class WikiNode
 // -- if it does, then call recursively for the new state
 // -- Add (as children of the current node) the result of the recursive call (should be WikiNode's)
 // -- If it's a terminal node, then parse the input and return a new TerminalNode with value set
-// ----- to the parsed input
+//    to the parsed input
 
 // Each node type will need an accompanying:
 // -- match input to creation of the node type 

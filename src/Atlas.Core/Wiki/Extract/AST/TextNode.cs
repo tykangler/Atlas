@@ -1,4 +1,4 @@
-using HtmlAgilityPack;
+using AngleSharp.Dom;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
@@ -6,23 +6,22 @@ public class TextNode : WikiNode
 {
     public string Value { get; }
 
-    internal static bool DoesMatch(HtmlNode node)
-    {
-        string[] disallowTags = {
-            "a", "table", "style", "sup"
-        };
+    private static bool DoesMatch(INode node) =>
+        node.NodeType == NodeType.Text && !string.IsNullOrWhiteSpace(node.Text());
 
-        return node.NodeType == HtmlNodeType.Text;
-    }
-
-    internal static TextNode? Parse(HtmlNode node)
+    internal static bool TryParse(INode node, out WikiNode? wikiNode)
     {
-        string cleanedText = CleanText(node.InnerText);
-        if (!string.IsNullOrWhiteSpace(cleanedText))
+        if (DoesMatch(node))
         {
-            return new TextNode(cleanedText);
+            string cleanedText = CleanText(node.TextContent);
+            if (!string.IsNullOrWhiteSpace(cleanedText))
+            {
+                wikiNode = new TextNode(cleanedText);
+                return true;
+            }
         }
-        return null;
+        wikiNode = null;
+        return false;
     }
 
     internal static string CleanText(string text) =>

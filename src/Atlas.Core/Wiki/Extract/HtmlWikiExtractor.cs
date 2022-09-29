@@ -1,6 +1,7 @@
 namespace Atlas.Core.Wiki.Extract.AST;
 
-using HtmlAgilityPack;
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 
 /// <summary>
 /// Parses through an html page from wikipedia and builds an ordered collection of WikiNode's
@@ -9,44 +10,67 @@ using HtmlAgilityPack;
 /// </summary>
 public class HtmlWikiExtractor : IWikiExtractor
 {
-    string[] disallowClasses = {
-        "infobox", "reflist", "reference", "reference-text"
+    private readonly string[] disallowClasses = {
+        "infobox", "reflist", "reference", "reference-text", "hatnote"
     };
-    string[] disallowTags = { "style", "sup" };
+    private readonly string[] disallowTags = { "style", "sup", "img" };
 
-    public IEnumerable<WikiNode> Extract(string htmlDoc)
+    private HtmlParser htmlParser;
+
+    public HtmlWikiExtractor()
     {
-        // parse html
-        HtmlDocument doc = new();
-        doc.LoadHtml(htmlDoc);
-        var documentNode = doc.DocumentNode;
-
-        // build node list
-        return ExtractNode(documentNode.FirstChild); // root node div.mw-parser-output
+        htmlParser = new HtmlParser(new HtmlParserOptions
+        {
+            IsEmbedded = true,
+            IsNotConsumingCharacterReferences = true
+        });
     }
 
-    public IEnumerable<WikiNode> ExtractNode(HtmlNode node)
+    public async Task<IEnumerable<WikiNode>> Extract(string htmlDoc)
     {
-        var classes = node.GetClasses();
-        if (disallowTags.Contains(node.Name) || disallowClasses.Any(classes.Contains))
-            return Enumerable.Empty<WikiNode>();
-        else if (SectionNode.DoesMatch(node))
-            return new List<WikiNode> { SectionNode.Parse(node) };
-        else if (LinkNode.DoesMatch(node))
-            return new List<WikiNode> { LinkNode.Parse(node) };
-        else if (ListNode.DoesMatch(node))
-            return new List<WikiNode> { ListNode.Parse(node) };
-        else if (TableNode.DoesMatch(node))
-            return new List<WikiNode> { TableNode.Parse(node) };
-        else if (TextNode.DoesMatch(node))
+        var document = await this.htmlParser.ParseDocumentAsync(htmlDoc);
+        if (document.Body?.FirstElementChild != null)
         {
-            var parsedNode = TextNode.Parse(node);
-            if (parsedNode != null)
-            {
-                return new List<WikiNode> { parsedNode };
-            }
-            return Enumerable.Empty<WikiNode>();
+            // build node list
+            return Extract(document.Body.FirstElementChild); // div.mw-parser-output
         }
-        else return node.ChildNodes.SelectMany(ExtractNode);
+        return Enumerable.Empty<WikiNode>();
+    }
+
+    private IEnumerable<WikiNode> Extract(IElement htmlElement)
+    {
+        List<WikiNode> wikiNodes = new();
+        foreach (var childHtmlNode in htmlElement.ChildNodes)
+        {
+            if (TextNode.TryParse(childHtmlNode, out var textNode))
+            {
+                wikiNodes.Add(textNode!);
+            }
+            else if (childHtmlNode is IElement elem)
+            {
+                if (!disallowTags.Contains(elem.TagName) &&
+                    !disallowClasses.Any(elem.ClassList.Contains))
+                {
+                    if (SectionNode.TryParse(elem, out var sectionNode))
+                    {
+                        wikiNodes.Add(sectionNode!);
+                    }
+                    else if (InterLinkNode.TryParse(elem, out var interlinkNode))
+                    {
+                        wikiNodes.Add(interlinkNode!);
+                    }
+                    else if (ListNode.TryParse(elem, out var listNode))
+                    {
+                        wikiNodes.Add(listNode!);
+                    }
+                    else if (TableNode.TryParse(elem, out var tableNode))
+                    {
+                        wikiNodes.Add(tableNode!);
+                    }
+                    else wikiNodes.AddRange(Extract(elem));
+                }
+            }
+        }
+        return wikiNodes;
     }
 }
