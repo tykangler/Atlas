@@ -119,6 +119,63 @@ by chunk and parse the unzipped chunk. The chunk will then be sent to the langua
 work on the next chunk. The language parser will read in data from the shared FIFO queue, and find entities + relationships. It will 
 resolve pronouns by calling a python script. This will probably be the bottleneck. The parsed data will be indexed via observers in the Indexer.
 
+### Parser
+
+The parser will be implemented as a scanless parser using a finite state machine, and will return a string of cleaned text with only interwiki links marked up.
+
+**Wikitext markup**:
+| Element            | Format                                        | HTML                           | Template                                            | Action                         |
+|--------------------|-----------------------------------------------|--------------------------------|-----------------------------------------------------|--------------------------------|
+| Headings           | `={0,6}...={0,6}`                             | `<h1>`, `<h2>`, ...            | template exists, but should not be used in articles | Remove                         |
+| Horizontal Rule    | ----                                          | `<hr>`                         |                                                     | Remove                         |
+| Table of Contents  | \_\_TOC\_\_, \_\_FORCE_TOC\_\_, \_\_NOTOC\_\_ |                                | {{TOC limit}}                                       | Remove                         |
+| Line Breaks        | `enter`                                       | `<br>`, `<br/>`                | {{break}}, {{-}}, {{clear}}                         | Remove                         |
+| Unordered list     | \*, \*\*, \*\*\*, ...                         | `<ul>`                         | {{plainlist}}, {{unbulleted list}}                  | Retain text. Handler           |
+| Ordered list       | \#, \#\#, \#\#\#, ...                         | `<ol>`                         |                                                     | Retain text. Handler           |
+| Description list   | ; followed by :                               | `<dl>`, `<dt>`, `<dd>`         | {{glossary}}, {{term}}, {{defn}}                    | Retain text. Handler           |
+| Indents            | :, ::, :::, ...                               |                                | {{outdent}}, {{outdent2}}                           | Remove                         |
+| Blockquote         |                                               | `<blockquote>`                 | {{quote}}                                           | Retain text                    |
+| Italics            | ''...''                                       |                                |                                                     | Retain text                    |
+| Bold               | '''...'''                                     |                                |                                                     | Retain text                    |
+| Bold Italics       | '''''...'''''                                 |                                |                                                     | Retain text                    |
+| Small Caps         |                                               |                                | {{smallcaps}}                                       | Retain text                    |
+| Code               |                                               | `<code>`                       |                                                     | Remove                         |
+| Syntax Highlight   |                                               | `<syntaxhighlight>`            |                                                     | Remove                         |
+| Small text         |                                               | `<small>`                      |                                                     | Retain text                    |
+| Big text           |                                               | `<big>`                        |                                                     | Retain text                    |
+| Non breaking space |                                               |                                | {{nowrap}}                                          | Replace with whitespace        |
+| Extra spacing      |                                               |                                | {{pad}}                                             | Replace with whitespace        |
+| Special Symbols    | &<code>;                                      |                                |                                                     | Remove/Replace with whitespace |
+| Math               |                                               | `<math>`                       | {{math}}                                            | Remove                         |
+| Pronunication aids |                                               |                                | {{IPAc-en}}, {{respell}}                            | Remove                         |
+| Musical Notation   |                                               | `<score>`                      |                                                     | Remove                         |
+| Images             | [[File:<filname>\|...\|...\|...]]             |                                |                                                     | Remove                         |
+| Tables             | {\|...\|}                                     | `<table>`                      |                                                     | Retain text with handler       |
+| Columns            |                                               |                                | {{colbegin}}, {{colend}}                            | Retain text with handler       |
+| References         | `<ref>`                                       |                                | {{cite}}, {{Citation needed}}                       | Remove                         |
+| Escape formatting  | Leading space: Doesn't apply to wiki markup   | `<nowiki>` `<nowiki/>` `<pre>` |                                                     |                                |
+
+
+**Model of finite state machine:**
+```mermaid
+flowchart LR
+start -->|*| start
+start -->|=| Heading --> start
+start -->|-| HorizontalRule --> start
+start -->|__| TOC+
+TOC+ -->|FORCETOC| FORCETOC --> start
+TOC+ -->|TOC| TOC --> start
+TOC+ -->|NOTOC| NOTOC  --> start
+start -->|:| Indentation --> start
+start -->|*| UnorderedList --> start
+start -->|#| OrderedList --> start
+start -->|";"| DescriptionList --> start
+start -->|'| ItalicsBold -->|a| start
+ItalicsBold -->|'| ItalicsBold
+start -->
+
+```
+
 ## Data Model
 
 Can either store data in hash graph to support fast lookup in memory, or use a graph database like neo4j that supports shortest path lookup. Persist data after creating the model

@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
@@ -14,14 +15,14 @@ public class ListNode : WikiNode
         return elem.TagName == orderedList || elem.TagName == unorderedList;
     }
 
-    internal static bool TryParse(IElement elem, out WikiNode? wikiNode)
+    public static bool TryParse(IElement elem, out ListNode? wikiNode)
     {
         if (Validate(elem))
         {
             var listItems =
                 from child in elem.Children
                 where child.TagName == listItem
-                select child.Text();
+                select child.Text().NormalizeWhiteSpace();
             wikiNode = new ListNode(listItems);
             return true;
         }

@@ -12,7 +12,7 @@ public class TableNode : WikiNode
         return elem.TagName == "table";
     }
 
-    internal static bool TryParse(IElement elem, out WikiNode? wikiNode)
+    internal static bool TryParse(IElement elem, out TableNode? wikiNode)
     {
         if (Validate(elem))
         {

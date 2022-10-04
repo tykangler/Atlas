@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
@@ -13,11 +14,11 @@ public class SectionNode : WikiNode
         return elem.ClassList.Contains(sectionHeadingClass);
     }
 
-    internal static bool TryParse(IElement elem, out WikiNode? wikiNode)
+    public static bool TryParse(IElement elem, out SectionNode? wikiNode)
     {
         if (Validate(elem))
         {
-            wikiNode = new SectionNode(elem.Text());
+            wikiNode = new SectionNode(elem.Text().NormalizeWhiteSpace());
             return true;
         }
         wikiNode = null;

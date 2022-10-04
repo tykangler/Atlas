@@ -9,7 +9,7 @@ public class TextNode : WikiNode
     private static bool DoesMatch(INode node) =>
         node.NodeType == NodeType.Text && !string.IsNullOrWhiteSpace(node.Text());
 
-    internal static bool TryParse(INode node, out WikiNode? wikiNode)
+    internal static bool TryParse(INode node, out TextNode? wikiNode)
     {
         if (DoesMatch(node))
         {

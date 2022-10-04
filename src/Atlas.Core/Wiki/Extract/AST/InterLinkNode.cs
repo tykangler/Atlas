@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
@@ -23,14 +24,14 @@ public class InterLinkNode : WikiNode
         return isAnchor && hasWikiHref && hasSingleText;
     }
 
-    internal static bool TryParse(IElement elem, out WikiNode? wikiNode)
+    public static bool TryParse(IElement elem, out InterLinkNode? wikiNode)
     {
         // moved Validate here instead of outside, since here we can guarantee
         // that the node is valid.
         if (Validate(elem))
         {
             string link = elem.GetAttribute(href)!; // validated above
-            wikiNode = new InterLinkNode(link, elem.ChildNodes.First().Text());
+            wikiNode = new InterLinkNode(link, elem.ChildNodes.First().TextContent.NormalizeWhiteSpace());
             return true;
         }
         wikiNode = null;
