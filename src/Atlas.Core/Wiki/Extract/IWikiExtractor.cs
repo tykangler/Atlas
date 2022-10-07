@@ -1,4 +1,6 @@
-namespace Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Extract.AST;
+
+namespace Atlas.Core.Wiki.Extract;
 
 public interface IWikiExtractor
 {

@@ -27,8 +27,5 @@ public class SectionNode : WikiNode
 
     public SectionNode(string value) => Value = value;
 
-    public override void Accept(ASTVisitor visitor)
-    {
-        visitor.VisitSection(this);
-    }
+    public override void Accept(ASTVisitor visitor) => visitor.VisitSection(this);
 }

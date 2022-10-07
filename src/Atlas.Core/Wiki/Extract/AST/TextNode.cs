@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
@@ -9,11 +10,11 @@ public class TextNode : WikiNode
     private static bool DoesMatch(INode node) =>
         node.NodeType == NodeType.Text && !string.IsNullOrWhiteSpace(node.Text());
 
-    internal static bool TryParse(INode node, out TextNode? wikiNode)
+    public static bool TryParse(INode node, out TextNode? wikiNode)
     {
         if (DoesMatch(node))
         {
-            string cleanedText = CleanText(node.TextContent);
+            string cleanedText = ReplaceNewlineLiterals(node.TextContent).NormalizeWhiteSpace();
             if (!string.IsNullOrWhiteSpace(cleanedText))
             {
                 wikiNode = new TextNode(cleanedText);
@@ -24,9 +25,7 @@ public class TextNode : WikiNode
         return false;
     }
 
-    internal static string CleanText(string text) =>
-        text.Replace(@"\n", "")
-            .Trim();
+    private static string ReplaceNewlineLiterals(string s) => s.Replace(@"\n", " ");
 
     public TextNode(string value) => this.Value = value;
 
@@ -34,4 +33,5 @@ public class TextNode : WikiNode
     {
         visitor.VisitText(this);
     }
+
 }

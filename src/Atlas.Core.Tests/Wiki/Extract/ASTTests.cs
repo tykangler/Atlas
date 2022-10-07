@@ -1,8 +1,8 @@
 using Atlas.Core.Wiki.Extract.AST;
-using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Xunit.Abstractions;
+using Atlas.Core.Tests.Utility;
 
 namespace Atlas.Core.Tests.Wiki.Extract;
 
@@ -14,17 +14,6 @@ public class ASTTests
     public ASTTests(ITestOutputHelper output)
     {
         this.output = output;
-    }
-
-    private async Task<IElement> CreateDocument(string html)
-    {
-        HtmlParser htmlParser = new(new HtmlParserOptions
-        {
-            IsEmbedded = true,
-            IsNotConsumingCharacterReferences = true
-        });
-        var document = await htmlParser.ParseDocumentAsync(html);
-        return document.Body!.FirstElementChild!;
     }
 
     [Trait("Category", "Extract")]
@@ -42,11 +31,11 @@ public class ASTTests
     {
         var expected = "Test Interlink";
         var link = "/wiki/test-link";
-        var elem = await CreateDocument(@$"
+        var elem = await HtmlUtility.CreateDocument(@$"
             <a href='{link}'>
                 {text}
-            </a>");
-        bool successful = InterLinkNode.TryParse(elem, out var interlinkNode);
+            </a>") as IElement;
+        bool successful = LinkNode.TryParse(elem!, out var interlinkNode);
         Assert.True(successful);
         Assert.NotNull(interlinkNode);
         Assert.True(expected == interlinkNode!.Value);
@@ -57,10 +46,10 @@ public class ASTTests
     [Fact]
     public async Task Interlink_WhenInputIsInvalid_ReturnsNullAndNodeIsNull()
     {
-        var elem = await CreateDocument(
+        var elem = await HtmlUtility.CreateDocument(
             @$"<p>Test</p>"
-        );
-        bool successful = InterLinkNode.TryParse(elem, out var interlinkNode);
+        ) as IElement;
+        bool successful = LinkNode.TryParse(elem!, out var interlinkNode);
         Assert.False(successful);
         Assert.Null(interlinkNode);
     }
@@ -76,7 +65,7 @@ public class ASTTests
             "Test",
             "List"
         };
-        var unorderedList = await CreateDocument(@$"
+        var unorderedList = await HtmlUtility.CreateDocument(@$"
             <ul>
                 <li>
                     {expectedItems[0]}
@@ -91,8 +80,8 @@ public class ASTTests
                     {expectedItems[3]}
                 </li>
             </ul>"
-        );
-        bool successful = ListNode.TryParse(unorderedList, out var listNode);
+        ) as IElement;
+        bool successful = ListNode.TryParse(unorderedList!, out var listNode);
         Assert.True(successful);
         Assert.NotNull(listNode);
         Assert.True(expectedItems.All(listNode!.ListItems.Contains));
@@ -103,10 +92,10 @@ public class ASTTests
     [Fact]
     public async Task List_WhenInputInvalid_ReturnsFalseAndNodeIsNull()
     {
-        var unorderedList = await CreateDocument(@$"
+        var unorderedList = await HtmlUtility.CreateDocument(@$"
             <a href='/wiki/test-link'>test</a>
-        ");
-        bool successful = ListNode.TryParse(unorderedList, out var listNode);
+        ") as IElement;
+        bool successful = ListNode.TryParse(unorderedList!, out var listNode);
         Assert.False(successful);
         Assert.Null(listNode);
     }
@@ -117,10 +106,10 @@ public class ASTTests
     public async Task Section_WhenInputValid_ReturnsTrueAndHasCorrectValue()
     {
         var expected = "headline test";
-        var section = await CreateDocument(@$"
+        var section = await HtmlUtility.CreateDocument(@$"
             <h2 class='mw-headline'>   {expected} </h2>
-        ");
-        bool successful = SectionNode.TryParse(section, out var sectionNode);
+        ") as IElement;
+        bool successful = SectionNode.TryParse(section!, out var sectionNode);
         Assert.True(successful);
         Assert.NotNull(sectionNode);
         Assert.True(expected == sectionNode!.Value);
@@ -131,11 +120,39 @@ public class ASTTests
     [Fact]
     public async Task Section_WhenInputInvalid_ReturnsFalseAndNodeIsNull()
     {
-        var section = await CreateDocument(@$"
+        var section = await HtmlUtility.CreateDocument(@$"
             <a href='/wiki/test-link'>test</a>
-        ");
-        bool successful = SectionNode.TryParse(section, out var sectionNode);
+        ") as IElement;
+        bool successful = SectionNode.TryParse(section!, out var sectionNode);
         Assert.False(successful);
         Assert.Null(sectionNode);
+    }
+
+    [Trait("Category", "Extact")]
+    [Trait("AST", "Text")]
+    [Fact]
+    public async Task Text_WhenInputHasLiteralNewlines_NewlinesAreRemoved()
+    {
+        string expected = "hello";
+        var text = await HtmlUtility.CreateDocument(@$"
+            \n\n\n\n\n{expected}\n\n\n\n\n
+        ");
+        bool successful = TextNode.TryParse(text, out var textNode);
+        Assert.True(successful);
+        Assert.True(textNode!.Value == expected);
+    }
+
+    [Trait("Category", "Extract")]
+    [Trait("AST", "Text")]
+    [Fact]
+    public async Task Text_WhenInputHasOnlyNewlineLiterals_TextNodeIsNull()
+    {
+        var text = await HtmlUtility.CreateDocument(@$"
+            \n\n\n\n\n\n  
+            \n\n   \n\n\n\n\n
+        ");
+        bool successful = TextNode.TryParse(text, out var textNode);
+        Assert.False(successful);
+        Assert.Null(textNode);
     }
 }

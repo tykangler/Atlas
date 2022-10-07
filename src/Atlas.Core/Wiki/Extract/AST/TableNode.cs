@@ -12,13 +12,9 @@ public class TableNode : WikiNode
         return elem.TagName == "table";
     }
 
-    internal static bool TryParse(IElement elem, out TableNode? wikiNode)
+    public static bool TryParse(IElement elem, out TableNode? wikiNode)
     {
-        if (Validate(elem))
-        {
-            wikiNode = null;
-            return true;
-        }
+        // default implementation 
         wikiNode = null;
         return false;
     }
@@ -29,8 +25,5 @@ public class TableNode : WikiNode
         TableData = data;
     }
 
-    public override void Accept(ASTVisitor visitor)
-    {
-        visitor.VisitTable(this);
-    }
+    public override void Accept(ASTVisitor visitor) => throw new NotImplementedException();
 }

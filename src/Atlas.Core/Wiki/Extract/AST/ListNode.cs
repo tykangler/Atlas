@@ -21,8 +21,9 @@ public class ListNode : WikiNode
         {
             var listItems =
                 from child in elem.Children
-                where child.TagName == listItem
-                select child.Text().NormalizeWhiteSpace();
+                let normalized = child.TextContent.NormalizeWhiteSpace()
+                where child.TagName == listItem && !string.IsNullOrWhiteSpace(normalized)
+                select normalized;
             wikiNode = new ListNode(listItems);
             return true;
         }
@@ -32,8 +33,5 @@ public class ListNode : WikiNode
 
     public ListNode(IEnumerable<string> listItems) => ListItems = listItems;
 
-    public override void Accept(ASTVisitor visitor)
-    {
-        visitor.VisitList(this);
-    }
+    public override void Accept(ASTVisitor visitor) => visitor.VisitList(this);
 }

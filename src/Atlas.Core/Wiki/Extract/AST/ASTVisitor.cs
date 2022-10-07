@@ -13,8 +13,8 @@ public abstract class ASTVisitor
     // will be ignoring infoboxes for now, no reliable way to extract information
     // tried dbpedia + wikidata. will maybe revisit in the future
     // but even then, there's some irrelevant and unclean information, random links to nowhere. 
-    public virtual void VisitTable(TableNode node) { }
-    public virtual void VisitInterLink(InterLinkNode node) { }
+    // public virtual void VisitTable(TableNode node) { }
+    public virtual void VisitLink(LinkNode node) { }
     public virtual void VisitText(TextNode node) { }
     public virtual void VisitSection(SectionNode node) { }
     public virtual void VisitList(ListNode node) { }
