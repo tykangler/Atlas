@@ -5,7 +5,9 @@ using Atlas.Core.Wiki.Extract.AST;
 public class WikiTokenVisitor : ASTVisitor
 {
     private TextWriter writer;
+
     public WikiTokenVisitor(TextWriter writer) => this.writer = writer;
+
     public override void VisitLink(LinkNode node)
     {
         string heading = node.IsInterlink ? "INTERLINK" : "LINK";
