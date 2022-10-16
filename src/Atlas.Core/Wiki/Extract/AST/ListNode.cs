@@ -19,11 +19,18 @@ public class ListNode : WikiNode
     {
         if (Validate(elem))
         {
-            var listItems =
-                from child in elem.Children
-                let normalized = child.TextContent.NormalizeWhiteSpace()
-                where child.TagName == listItem && !string.IsNullOrWhiteSpace(normalized)
-                select normalized;
+            // var listItems =
+            //     from child in elem.Children
+            //     let normalized = child.TextContent.NormalizeWhiteSpace()
+            //     where child.TagName == listItem && !string.IsNullOrWhiteSpace(normalized)
+            //     select normalized;
+
+            var listItems = elem.Children
+                .Where(child => child.TagName == listItem)
+                .Select(child =>
+                {
+
+                });
             wikiNode = new ListNode(listItems);
             return true;
         }

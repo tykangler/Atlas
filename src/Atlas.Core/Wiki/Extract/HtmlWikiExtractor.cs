@@ -12,9 +12,9 @@ using Atlas.Core.Wiki.Extract.AST;
 public class HtmlWikiExtractor : IWikiExtractor
 {
     private readonly string[] disallowClasses = {
-        "infobox", "reflist", "reference", "hatnote", "thumb"
+        "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
     };
-    private readonly string[] disallowTags = { "style", "sup", "img" };
+    private readonly string[] disallowTags = { "style", "sup", "img", "table" };
 
     private HtmlParser htmlParser;
 
@@ -39,8 +39,10 @@ public class HtmlWikiExtractor : IWikiExtractor
     }
 
 
-    // TODO: Revise TryParse to set out var to non-null value
-    // TODO: Find better way to set text values that don't involve creating new objects
+    // design: Revise TryParse to set out var to non-null value
+    // design: Find better way to set text values that don't involve creating new objects
+    // FIXME: Filter out unallowed tags and classes in node parsing methods (list)
+    // FIXME: 
     private List<WikiNode> Extract(IElement htmlElement)
     {
         List<WikiNode> wikiNodes = new();
@@ -60,7 +62,7 @@ public class HtmlWikiExtractor : IWikiExtractor
             }
             else if (childHtmlNode is IElement elem)
             {
-                if (!disallowTags.Contains(elem.TagName) &&
+                if (!disallowTags.Contains(elem.TagName.ToLower()) &&
                     !StringsPartiallyContain(refs: disallowClasses, target: elem.ClassList))
                 {
                     if (SectionNode.TryParse(elem, out var sectionNode))
@@ -79,7 +81,7 @@ public class HtmlWikiExtractor : IWikiExtractor
                     {
                         wikiNodes.Add(tableNode!);
                     }
-                    // TODO: Don't like that there are side effects
+                    // design: Don't like that there are side effects
                     else AddRangeAndMergeTextNodes(wikiNodes, Extract(elem));
                 }
             }

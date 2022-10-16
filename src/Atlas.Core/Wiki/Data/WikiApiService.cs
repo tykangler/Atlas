@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Atlas.Core.Exceptions;
 using Atlas.Core.Extensions;
+using Atlas.Core.Wiki.Data.Models;
 
 namespace Atlas.Core.Wiki.Data;
 
@@ -9,6 +10,7 @@ namespace Atlas.Core.Wiki.Data;
 /// Exposes methods to retrieve wikipedia page data from the api and deserializes responses
 /// to defined models
 /// </summary>
+// TODO: Add handing for warnings
 public class WikiApiService
 {
     private readonly (string, string)[] defaultQueryParams = new (string, string)[] {
@@ -42,9 +44,10 @@ public class WikiApiService
     /// </exception>
     /// <exception cref="InvalidOperationException">If request already set</exception>
     /// <exception cref="WikiApiException">If response is an error response as defined by mediawiki</exception>
-    public async IAsyncEnumerable<uint> GetPageIds([EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<WikiPageResponse> GetPageIdsAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        IEnumerable<(string, string)> queryParams = defaultQueryParams.Concat(new (string, string)[] {
+        var queryParams = defaultQueryParams.Concat(new (string, string)[] {
             ("action", "query"),
             ("generator", "allpages"),
             ("gapfilterdir", "nonredirects"),
@@ -52,6 +55,7 @@ public class WikiApiService
             ("gapminsize", "17000")
         });
         string continueQuery = string.Empty; // query to continue generating pages from
+        var deserializeOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
         do
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -69,23 +73,64 @@ public class WikiApiService
                 .EnumerateArray();
             foreach (var pageNode in pages)
             {
-                yield return pageNode.GetProperty(pageIdKey).GetUInt32();
+                yield return pageNode.Deserialize<WikiPageResponse>(deserializeOptions)!;
             }
         } while (!string.IsNullOrEmpty(continueQuery));
     }
 
-    public async
+    public async Task<WikiParseResponse> ParsePageFromIdAsync(string pageId, CancellationToken cancellationToken = default)
+    {
+        var queryParams = defaultQueryParams.Concat(new (string, string)[] {
+            ("action", "parse"),
+            ("prop", "text|categories"),
+            ("pageid", pageId),
+            ("redirects", "true"),
+            // disabled sections
+            ("disableeditsection", "true"),
+            ("disabletoc", "true"),
+            ("disablelimitreport", "true"),
+        });
+        return await ParsePageWithQueryParamsAsync(queryParams, cancellationToken);
+    }
+
+    public async Task<WikiParseResponse> ParsePageFromTitleAsync(string pageTitle, CancellationToken cancellationToken = default)
+    {
+        var queryParams = defaultQueryParams.Concat(new (string, string)[] {
+            ("action", "parse"),
+            ("prop", "text|categories"),
+            ("page", pageTitle),
+            ("redirects", "true"),
+            // disabled sections
+            ("disableeditsection", "true"),
+            ("disabletoc", "true"),
+            ("disablelimitreport", "true"),
+        });
+        return await ParsePageWithQueryParamsAsync(queryParams, cancellationToken);
+    }
+
+    private async Task<WikiParseResponse> ParsePageWithQueryParamsAsync(
+        IEnumerable<(string, string)> queryParams, CancellationToken cancellationToken = default)
+    {
+        var response = await this.httpClient.GetWithQueryAsync(queryParams, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        var root = (await response.Content.ReadAsJsonDocumentAsync(cancellationToken)).RootElement;
+        ThrowIfErrorResponse(root, response);
+
+        JsonSerializerOptions deserializeOptions = new(JsonSerializerDefaults.Web);
+        var parseResponse = root.GetProperty("parse").Deserialize<WikiParseResponse>(deserializeOptions)!;
+        return parseResponse;
+    }
 
     private void ThrowIfErrorResponse(JsonElement jsonElement, HttpResponseMessage response)
     {
         if (jsonElement.TryGetProperty(errorsKey, out var errors)) // get errors
         {
+            JsonSerializerOptions options = new(JsonSerializerDefaults.Web);
             string requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
-            var wikiErrors = errors.Deserialize<IEnumerable<WikiErrorResponse>>()!;
+            var wikiErrors = errors.Deserialize<IEnumerable<WikiErrorResponse>>(options)!;
             throw new WikiApiException(
                 $"Request {requestUri} failed with errors.",
                 wikiErrors);
         }
     }
-
 }

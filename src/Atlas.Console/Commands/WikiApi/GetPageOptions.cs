@@ -5,31 +5,35 @@ using System.Diagnostics;
 using CommandLine;
 using Atlas.Core.Wiki.Data;
 using Atlas.Core.Exceptions;
+using Atlas.Core.Wiki.Data.Models;
 
-[Verb("wiki-page-ids", HelpText = "Get Wikipedia page ids")]
-public class PageIdOptions
+[Verb("wiki-get-page", HelpText = "Get Wikipedia page ids")]
+public class GetPageOptions
 {
-    [Option('t', "timeout", HelpText = "timeout in milliseconds before cancelling operation", Required = true)]
+    [Option('t', "timeout", HelpText = "timeout in milliseconds before cancelling operation", Required = true, Default = 1000)]
     public int Timeout { get; set; }
 
     [Option('o', "out", HelpText = "output file to print page ids. prints to console if not specified.")]
     public string? OutFile { get; set; }
 
-    [Option('c', "chunk-size", HelpText = "only valid with --output specified. Writes chunk-size page ids per line.")]
+    [Option('c', "chunk-size", HelpText = "only valid with --output specified. Writes chunk-size page ids per line.", Default = 1)]
     public int ChunkSize { get; set; }
+
+    [Option('p', "page-titles", HelpText = "return page titles instead of page ids", Default = false)]
+    public bool PrintTitles { get; set; }
 
     public async Task Callback()
     {
         var apiService = new WikiApiService(new HttpClient());
         var stopWatch = Stopwatch.StartNew();
-        List<uint> allPageIds = new List<uint>();
+        List<WikiPageResponse> allPages = new List<WikiPageResponse>();
         try
         {
             using (var tokenSource = new CancellationTokenSource(millisecondsDelay: this.Timeout))
             {
-                await foreach (var pageId in apiService.GetPageIds().WithCancellation(tokenSource.Token))
+                await foreach (var page in apiService.GetPageIdsAsync().WithCancellation(tokenSource.Token))
                 {
-                    allPageIds.Add(pageId);
+                    allPages.Add(page);
                 }
             }
         }
@@ -49,19 +53,22 @@ public class PageIdOptions
             stopWatch.Stop();
             if (OutFile != null)
             {
-                var chunkedResult = allPageIds.Chunk(ChunkSize).Select(chunk => string.Join(", ", chunk));
+                var chunkedResult = allPages
+                    .Select(page => PrintTitles ? page.Title : page.PageId.ToString())
+                    .Chunk(ChunkSize)
+                    .Select(chunk => string.Join(", ", chunk));
                 await File.WriteAllLinesAsync(OutFile, chunkedResult);
             }
             else
             {
-                foreach (uint id in allPageIds)
+                foreach (var page in allPages)
                 {
-                    Console.WriteLine(id);
+                    Console.WriteLine(PrintTitles ? page.Title : page.PageId);
                 }
             }
             Console.WriteLine("operation canceled");
             Console.WriteLine($"{stopWatch.ElapsedMilliseconds / 1000.0} seconds elapsed");
-            Console.WriteLine($"{allPageIds.Count} page ids retrieved");
+            Console.WriteLine($"{allPages.Count} page ids retrieved");
         }
     }
 
