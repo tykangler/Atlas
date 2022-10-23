@@ -35,8 +35,13 @@ public class IWikiExtractorTests
             textNode.Value == "Test text");
         Assert.True(tokens[2] is SectionNode sectionNode &&
             sectionNode.Value == "section heading");
-        Assert.True(tokens[3] is ListNode listNode &&
-            listNode.ListItems.All(new string[] { "test", "list" }.Contains));
+        var listNode = tokens[3] as ListNode;
+        Assert.True(listNode != null);
+        Assert.True(listNode?.ListItems.Count() == 2);
+        var firstListNode = listNode!.ListItems.First() as TextNode;
+        var secondListNode = listNode!.ListItems.Last() as TextNode;
+        Assert.True(firstListNode != null && firstListNode.Value == "test");
+        Assert.True(secondListNode != null && secondListNode.Value == "list");
     }
 
     [Trait("Category", "Extract")]
@@ -105,8 +110,8 @@ public class IWikiExtractorTests
                     textNode.Value == "test paragraph test span with strong");
         Assert.True(tokens[2] is ListNode listNode &&
                     listNode.ListItems.Count() == 2 &&
-                    listNode.ListItems.First() == "list with em" &&
-                    listNode.ListItems.Last() == "list with strong");
+                    (listNode.ListItems.First() as TextNode)?.Value == "list with em" &&
+                    (listNode.ListItems.Last() as TextNode)?.Value == "list with strong");
         Assert.True(tokens[3] is SectionNode sectionNode &&
                     sectionNode.Value == "Section heading");
     }

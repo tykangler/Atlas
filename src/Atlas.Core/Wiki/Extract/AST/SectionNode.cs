@@ -14,15 +14,13 @@ public class SectionNode : WikiNode
         return elem.ClassList.Contains(sectionHeadingClass);
     }
 
-    public static bool TryParse(IElement elem, out SectionNode? wikiNode)
+    public static SectionNode? TryParse(IElement elem)
     {
         if (Validate(elem))
         {
-            wikiNode = new SectionNode(elem.Text().NormalizeWhiteSpace());
-            return true;
+            return new SectionNode(elem.Text().NormalizeWhiteSpace());
         }
-        wikiNode = null;
-        return false;
+        return null;
     }
 
     public SectionNode(string value) => Value = value;

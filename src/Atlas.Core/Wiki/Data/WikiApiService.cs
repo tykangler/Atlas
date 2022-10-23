@@ -47,6 +47,7 @@ public class WikiApiService
     public async IAsyncEnumerable<WikiPageResponse> GetPageIdsAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // TODO: change this to be done in batches so that we guarantee serial request timing, not parallel
         var queryParams = defaultQueryParams.Concat(new (string, string)[] {
             ("action", "query"),
             ("generator", "allpages"),

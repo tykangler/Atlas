@@ -10,19 +10,17 @@ public class TextNode : WikiNode
     private static bool DoesMatch(INode node) =>
         node.NodeType == NodeType.Text && !string.IsNullOrWhiteSpace(node.Text());
 
-    public static bool TryParse(INode node, out TextNode? wikiNode)
+    public static TextNode? TryParse(INode node)
     {
         if (DoesMatch(node))
         {
             string cleanedText = ReplaceNewlineLiterals(node.TextContent).NormalizeWhiteSpace();
             if (!string.IsNullOrWhiteSpace(cleanedText))
             {
-                wikiNode = new TextNode(cleanedText);
-                return true;
+                return new TextNode(cleanedText);
             }
         }
-        wikiNode = null;
-        return false;
+        return null;
     }
 
     private static string ReplaceNewlineLiterals(string s) => s.Replace(@"\n", " ");

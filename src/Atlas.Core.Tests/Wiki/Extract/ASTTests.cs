@@ -8,7 +8,8 @@ namespace Atlas.Core.Tests.Wiki.Extract;
 
 public class ASTTests
 {
-
+    private readonly Func<IElement, List<WikiNode>> testExtractFunc = elem =>
+        new List<WikiNode> { new TextNode(elem.TextContent) };
     private readonly ITestOutputHelper output;
 
     public ASTTests(ITestOutputHelper output)
@@ -35,11 +36,10 @@ public class ASTTests
             <a href='{link}'>
                 {text}
             </a>") as IElement;
-        bool successful = LinkNode.TryParse(elem!, out var interlinkNode);
-        Assert.True(successful);
+        var interlinkNode = LinkNode.TryParse(elem!);
         Assert.NotNull(interlinkNode);
-        Assert.True(expected == interlinkNode!.Value);
-        Assert.True(link == interlinkNode!.Url);
+        Assert.True(expected == interlinkNode?.Value);
+        Assert.True(link == interlinkNode?.Url);
     }
 
     [Trait("Category", "Extract")]
@@ -49,8 +49,7 @@ public class ASTTests
         var elem = await HtmlUtility.CreateDocument(
             @$"<p>Test</p>"
         ) as IElement;
-        bool successful = LinkNode.TryParse(elem!, out var interlinkNode);
-        Assert.False(successful);
+        var interlinkNode = LinkNode.TryParse(elem!);
         Assert.Null(interlinkNode);
     }
 
@@ -67,24 +66,20 @@ public class ASTTests
         };
         var unorderedList = await HtmlUtility.CreateDocument(@$"
             <ul>
-                <li>
-                    {expectedItems[0]}
-                </li>
-                <li>
-                    {expectedItems[1]}
-                </li>
-                <li>
-                    {expectedItems[2]}
-                </li>
-                <li>
-                    {expectedItems[3]}
-                </li>
+                <li>{expectedItems[0]}</li>
+                <li>{expectedItems[1]}</li>
+                <li>{expectedItems[2]}</li>
+                <li>{expectedItems[3]}</li>
             </ul>"
         ) as IElement;
-        bool successful = ListNode.TryParse(unorderedList!, out var listNode);
-        Assert.True(successful);
+        var listNode = ListNode.TryParse(unorderedList!, testExtractFunc);
         Assert.NotNull(listNode);
-        Assert.True(expectedItems.All(listNode!.ListItems.Contains));
+        Assert.True(listNode!.ListItems.Count() == 4);
+        var listItems = listNode!.ListItems.ToList();
+        Assert.True((listItems[0] as TextNode)?.Value == "Hello");
+        Assert.True((listItems[1] as TextNode)?.Value == "World");
+        Assert.True((listItems[2] as TextNode)?.Value == "Test");
+        Assert.True((listItems[3] as TextNode)?.Value == "List");
     }
 
     [Trait("Category", "Extract")]
@@ -95,8 +90,7 @@ public class ASTTests
         var unorderedList = await HtmlUtility.CreateDocument(@$"
             <a href='/wiki/test-link'>test</a>
         ") as IElement;
-        bool successful = ListNode.TryParse(unorderedList!, out var listNode);
-        Assert.False(successful);
+        var listNode = ListNode.TryParse(unorderedList!, testExtractFunc);
         Assert.Null(listNode);
     }
 
@@ -109,8 +103,7 @@ public class ASTTests
         var section = await HtmlUtility.CreateDocument(@$"
             <h2 class='mw-headline'>   {expected} </h2>
         ") as IElement;
-        bool successful = SectionNode.TryParse(section!, out var sectionNode);
-        Assert.True(successful);
+        var sectionNode = SectionNode.TryParse(section!);
         Assert.NotNull(sectionNode);
         Assert.True(expected == sectionNode!.Value);
     }
@@ -123,8 +116,7 @@ public class ASTTests
         var section = await HtmlUtility.CreateDocument(@$"
             <a href='/wiki/test-link'>test</a>
         ") as IElement;
-        bool successful = SectionNode.TryParse(section!, out var sectionNode);
-        Assert.False(successful);
+        var sectionNode = SectionNode.TryParse(section!);
         Assert.Null(sectionNode);
     }
 
@@ -137,8 +129,7 @@ public class ASTTests
         var text = await HtmlUtility.CreateDocument(@$"
             \n\n\n\n\n{expected}\n\n\n\n\n
         ");
-        bool successful = TextNode.TryParse(text, out var textNode);
-        Assert.True(successful);
+        var textNode = TextNode.TryParse(text);
         Assert.True(textNode!.Value == expected);
     }
 
@@ -151,8 +142,7 @@ public class ASTTests
             \n\n\n\n\n\n  
             \n\n   \n\n\n\n\n
         ");
-        bool successful = TextNode.TryParse(text, out var textNode);
-        Assert.False(successful);
+        var textNode = TextNode.TryParse(text);
         Assert.Null(textNode);
     }
 }

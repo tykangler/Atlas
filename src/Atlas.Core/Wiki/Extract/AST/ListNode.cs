@@ -1,44 +1,36 @@
 using AngleSharp.Dom;
-using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Wiki.Extract.AST;
 
 public class ListNode : WikiNode
 {
-    private const string orderedList = "OL";
-    private const string unorderedList = "UL";
-    private const string listItem = "LI";
+    private const string orderedListTag = "OL";
+    private const string unorderedListTag = "UL";
+    private const string listTag = "LI";
 
-    public IEnumerable<string> ListItems { get; }
+    public IEnumerable<WikiNode> ListItems { get; }
     private static bool Validate(IElement elem)
     {
-        return elem.TagName == orderedList || elem.TagName == unorderedList;
+        return elem.TagName == orderedListTag || elem.TagName == unorderedListTag;
     }
 
-    public static bool TryParse(IElement elem, out ListNode? wikiNode)
+    public static ListNode? TryParse(IElement elem, Func<IElement, List<WikiNode>> extractFunc)
     {
         if (Validate(elem))
         {
-            // var listItems =
-            //     from child in elem.Children
-            //     let normalized = child.TextContent.NormalizeWhiteSpace()
-            //     where child.TagName == listItem && !string.IsNullOrWhiteSpace(normalized)
-            //     select normalized;
-
             var listItems = elem.Children
-                .Where(child => child.TagName == listItem)
-                .Select(child =>
-                {
+                .Where(child => child.TagName == listTag)
+                .SelectMany(extractFunc);
 
-                });
-            wikiNode = new ListNode(listItems);
-            return true;
+            if (listItems.Any())
+            {
+                return new ListNode(listItems);
+            }
         }
-        wikiNode = null;
-        return false;
+        return null;
     }
 
-    public ListNode(IEnumerable<string> listItems) => ListItems = listItems;
+    public ListNode(IEnumerable<WikiNode> listItems) => ListItems = listItems;
 
     public override void Accept(ASTVisitor visitor) => visitor.VisitList(this);
 }

@@ -12,11 +12,10 @@ public class TableNode : WikiNode
         return elem.TagName == "table";
     }
 
-    public static bool TryParse(IElement elem, out TableNode? wikiNode)
+    public static TableNode? TryParse(IElement elem)
     {
         // default implementation 
-        wikiNode = null;
-        return false;
+        return null;
     }
 
     public TableNode(IEnumerable<string> headers, IEnumerable<string> data)

@@ -19,7 +19,7 @@ public class WikiTokenVisitor : ASTVisitor
         this.writer.WriteLine("[LIST]");
         foreach (var item in node.ListItems)
         {
-            this.writer.WriteLine($"\t{item}");
+            item.Accept(this);
         }
     }
 

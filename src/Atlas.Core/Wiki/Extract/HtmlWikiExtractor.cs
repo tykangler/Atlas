@@ -2,6 +2,7 @@ namespace Atlas.Core.Wiki.Extract;
 
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using Atlas.Core.Extensions;
 using Atlas.Core.Wiki.Extract.AST;
 
 /// <summary>
@@ -14,7 +15,7 @@ public class HtmlWikiExtractor : IWikiExtractor
     private readonly string[] disallowClasses = {
         "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
     };
-    private readonly string[] disallowTags = { "style", "sup", "img", "table" };
+    private readonly string[] disallowTags = { "style", "sup", "img", "table", "cite" };
 
     private HtmlParser htmlParser;
 
@@ -22,8 +23,7 @@ public class HtmlWikiExtractor : IWikiExtractor
     {
         htmlParser = new HtmlParser(new HtmlParserOptions
         {
-            IsEmbedded = true,
-            IsNotConsumingCharacterReferences = true
+            IsEmbedded = true
         });
     }
 
@@ -33,22 +33,20 @@ public class HtmlWikiExtractor : IWikiExtractor
         if (document.Body?.FirstElementChild != null)
         {
             // build node list
-            return Extract(document.Body.FirstElementChild); // div.mw-parser-output
+            return ExtractFromHtml(document.Body.FirstElementChild); // div.mw-parser-output
         }
         return Enumerable.Empty<WikiNode>();
     }
 
 
-    // design: Revise TryParse to set out var to non-null value
     // design: Find better way to set text values that don't involve creating new objects
     // FIXME: Filter out unallowed tags and classes in node parsing methods (list)
-    // FIXME: 
-    private List<WikiNode> Extract(IElement htmlElement)
+    private List<WikiNode> ExtractFromHtml(IElement htmlElement)
     {
         List<WikiNode> wikiNodes = new();
         foreach (var childHtmlNode in htmlElement.ChildNodes)
         {
-            if (TextNode.TryParse(childHtmlNode, out var textNode))
+            if (TextNode.TryParse(childHtmlNode) is TextNode textNode)
             {
                 if (wikiNodes.Count > 0 && wikiNodes[^1] is TextNode previousTextNode)
                 {
@@ -60,55 +58,39 @@ public class HtmlWikiExtractor : IWikiExtractor
                     wikiNodes.Add(textNode!); // want to merge text nodes
                 }
             }
-            else if (childHtmlNode is IElement elem)
+            else if (childHtmlNode is IElement elem && ElementIsValid(elem))
             {
-                if (!disallowTags.Contains(elem.TagName.ToLower()) &&
-                    !StringsPartiallyContain(refs: disallowClasses, target: elem.ClassList))
+                if (SectionNode.TryParse(elem) is SectionNode sectionNode)
                 {
-                    if (SectionNode.TryParse(elem, out var sectionNode))
-                    {
-                        wikiNodes.Add(sectionNode!);
-                    }
-                    else if (LinkNode.TryParse(elem, out var interlinkNode))
-                    {
-                        wikiNodes.Add(interlinkNode!);
-                    }
-                    else if (ListNode.TryParse(elem, out var listNode))
-                    {
-                        wikiNodes.Add(listNode!);
-                    }
-                    else if (TableNode.TryParse(elem, out var tableNode))
-                    {
-                        wikiNodes.Add(tableNode!);
-                    }
-                    // design: Don't like that there are side effects
-                    else AddRangeAndMergeTextNodes(wikiNodes, Extract(elem));
+                    wikiNodes.Add(sectionNode);
+                }
+                else if (LinkNode.TryParse(elem) is LinkNode linkNode)
+                {
+                    wikiNodes.Add(linkNode);
+                }
+                else if (ListNode.TryParse(elem, ExtractFromHtml) is ListNode listNode)
+                {
+                    wikiNodes.Add(listNode);
+                }
+                else if (TableNode.TryParse(elem) is TableNode tableNode)
+                {
+                    wikiNodes.Add(tableNode);
+                }
+                // design: Don't like that there are side effects to wikiNodes
+                else
+                {
+                    var wikiNodesToAdd = ExtractFromHtml(elem);
+                    AddRangeAndMergeTextNodes(wikiNodes, wikiNodesToAdd);
                 }
             }
         }
         return wikiNodes;
     }
 
-    /// <summary>
-    /// Returns true if any string in <c>target</c> contains any string in <c>ref</c>
-    /// </summary>
-    /// <param name="refs">A list of strings that may be inner strings in target</param>
-    /// <param name="target">A list of strings that will be checked against the strings in ref</param>
-    /// <returns>true/false</returns>
-    private bool StringsPartiallyContain(IEnumerable<string> refs, IEnumerable<string> target)
-    {
-        foreach (var refString in refs)
-        {
-            foreach (var targetStr in target)
-            {
-                if (targetStr.Contains(refString))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    private bool ElementIsValid(IElement elem) =>
+        !disallowTags.Contains(elem.TagName, StringComparer.OrdinalIgnoreCase) &&
+        !disallowClasses.Any(cl =>
+            elem.ClassList.PartiallyContains(cl, StringComparison.OrdinalIgnoreCase));
 
     private TextNode MergeTextNodes(TextNode node1, TextNode node2) => new TextNode($"{node1.Value} {node2.Value}");
 
@@ -124,6 +106,5 @@ public class HtmlWikiExtractor : IWikiExtractor
         {
             wikiNodes.AddRange(toAdd);
         }
-
     }
 }
