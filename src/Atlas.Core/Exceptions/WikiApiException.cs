@@ -5,7 +5,7 @@ namespace Atlas.Core.Exceptions;
 [Serializable]
 public class WikiApiException : Exception
 {
-    public IEnumerable<WikiErrorResponse>? Errors { get; }
+    public IEnumerable<WikiError>? Errors { get; }
 
     public WikiApiException() { }
 
@@ -13,6 +13,6 @@ public class WikiApiException : Exception
 
     public WikiApiException(string message, Exception inner) : base(message, inner) { }
 
-    public WikiApiException(string message, IEnumerable<WikiErrorResponse> errors) : this(message) =>
+    public WikiApiException(string message, IEnumerable<WikiError>? errors) : this(message) =>
         this.Errors = errors;
 }

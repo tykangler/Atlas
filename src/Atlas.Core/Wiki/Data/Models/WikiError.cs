@@ -1,7 +1,7 @@
 namespace Atlas.Core.Wiki.Data.Models;
 
-public record WikiErrorResponse(
+public record WikiError(
     string Code,
     string Text,
-    string Module);
-
+    string Module,
+    bool IsWarning);

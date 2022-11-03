@@ -16,7 +16,7 @@ public class GetPageOptions
     [Option('o', "out", HelpText = "output file to print page ids. prints to console if not specified.")]
     public string? OutFile { get; set; }
 
-    [Option('c', "chunk-size", HelpText = "only valid with --output specified. Writes chunk-size page ids per line.", Default = 1)]
+    [Option('c', "chunk-size", HelpText = "only valid with --output specified. Writes chunk-size pages per line.", Default = 1)]
     public int ChunkSize { get; set; }
 
     [Option('p', "page-titles", HelpText = "return page titles instead of page ids", Default = false)]
@@ -25,31 +25,17 @@ public class GetPageOptions
     public async Task Callback()
     {
         var apiService = new WikiApiService(new HttpClient());
+        List<WikiPage> allPages = new List<WikiPage>();
         var stopWatch = Stopwatch.StartNew();
-        List<WikiPageResponse> allPages = new List<WikiPageResponse>();
         try
         {
-            using (var tokenSource = new CancellationTokenSource(millisecondsDelay: this.Timeout))
+            string continueFrom = "";
+            while (stopWatch.ElapsedMilliseconds < Timeout)
             {
-                await foreach (var page in apiService.GetPageIdsAsync().WithCancellation(tokenSource.Token))
-                {
-                    allPages.Add(page);
-                }
+                var pageBatch = await apiService.GetPages(continueFrom);
+                continueFrom = pageBatch.Continue;
+                allPages.AddRange(pageBatch.Pages);
             }
-        }
-        catch (WikiApiException ex)
-        {
-            Console.WriteLine(ex.Message);
-            if (ex.Errors != null)
-            {
-                foreach (var error in ex.Errors)
-                {
-                    Console.WriteLine(error);
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
             stopWatch.Stop();
             if (OutFile != null)
             {
@@ -66,10 +52,19 @@ public class GetPageOptions
                     Console.WriteLine(PrintTitles ? page.Title : page.PageId);
                 }
             }
-            Console.WriteLine("operation canceled");
             Console.WriteLine($"{stopWatch.ElapsedMilliseconds / 1000.0} seconds elapsed");
-            Console.WriteLine($"{allPages.Count} page ids retrieved");
+            Console.WriteLine($"{allPages.Count()} pages retrieved");
+        }
+        catch (WikiApiException ex)
+        {
+            Console.WriteLine(ex.Message);
+            if (ex.Errors != null)
+            {
+                foreach (var error in ex.Errors)
+                {
+                    Console.WriteLine(error);
+                }
+            }
         }
     }
-
 }

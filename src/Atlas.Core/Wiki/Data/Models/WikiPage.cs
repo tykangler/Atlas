@@ -1,6 +1,6 @@
 namespace Atlas.Core.Wiki.Data.Models;
 
-public record WikiPageResponse(
+public record WikiPage(
     int PageId,
     string Title
 );

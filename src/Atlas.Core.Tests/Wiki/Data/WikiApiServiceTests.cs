@@ -9,6 +9,5 @@ public class WikiApiServiceTests
     public void WhenTimeoutQueryOnPageIds_PageIdsAreReturned()
     {
         var apiService = new WikiApiService(new HttpClient());
-
     }
 }
