@@ -6,6 +6,7 @@ using CommandLine;
 using Atlas.Core.Wiki.Data;
 using Atlas.Core.Exceptions;
 using Atlas.Core.Wiki.Data.Models;
+using Atlas.Console.Services;
 
 [Verb("wiki-get-page", HelpText = "Get Wikipedia page ids")]
 public class GetPageOptions
@@ -25,7 +26,8 @@ public class GetPageOptions
     public async Task Callback()
     {
         var apiService = new WikiApiService(new HttpClient());
-        List<WikiPage> allPages = new List<WikiPage>();
+        List<WikiPage> allPages = new();
+        List<WikiError> warnings = new();
         var stopWatch = Stopwatch.StartNew();
         try
         {
@@ -33,27 +35,15 @@ public class GetPageOptions
             while (stopWatch.ElapsedMilliseconds < Timeout)
             {
                 var pageBatch = await apiService.GetPages(continueFrom);
-                continueFrom = pageBatch.Continue;
-                allPages.AddRange(pageBatch.Pages);
-            }
-            stopWatch.Stop();
-            if (OutFile != null)
-            {
-                var chunkedResult = allPages
-                    .Select(page => PrintTitles ? page.Title : page.PageId.ToString())
-                    .Chunk(ChunkSize)
-                    .Select(chunk => string.Join(", ", chunk));
-                await File.WriteAllLinesAsync(OutFile, chunkedResult);
-            }
-            else
-            {
-                foreach (var page in allPages)
+                continueFrom = pageBatch.Continue.GapContinue;
+                allPages.AddRange(pageBatch.Query.Pages);
+                if (pageBatch.Warnings != null)
                 {
-                    Console.WriteLine(PrintTitles ? page.Title : page.PageId);
+                    warnings.AddRange(pageBatch.Warnings); // only warnings since actual errors will throw exception
                 }
             }
-            Console.WriteLine($"{stopWatch.ElapsedMilliseconds / 1000.0} seconds elapsed");
-            Console.WriteLine($"{allPages.Count()} pages retrieved");
+            stopWatch.Stop();
+            await OutputResult(allPages, warnings, stopWatch.ElapsedMilliseconds);
         }
         catch (WikiApiException ex)
         {
@@ -65,6 +55,34 @@ public class GetPageOptions
                     Console.WriteLine(error);
                 }
             }
+        }
+    }
+
+    private async Task OutputResult(List<WikiPage> allPages, List<WikiError> warnings, long elapsedMilliseconds)
+    {
+        if (OutFile != null)
+        {
+            var chunkedResult = allPages
+                .Select(page => PrintTitles ? page.Title : page.PageId.ToString())
+                .Chunk(ChunkSize)
+                .Select(chunk => string.Join(", ", chunk));
+            using var outStream = FileUtilities.CreateFile(OutFile);
+            await PrintLines(outStream, chunkedResult);
+        }
+        else
+        {
+            await PrintLines(Console.Out, allPages.Select(page =>
+                PrintTitles ? page.Title : page.PageId.ToString()));
+        }
+        Console.WriteLine($"{elapsedMilliseconds / 1000.0} seconds elapsed");
+        Console.WriteLine($"{allPages.Count()} pages retrieved");
+    }
+
+    private async Task PrintLines(TextWriter writer, IEnumerable<string> lines)
+    {
+        foreach (var line in lines)
+        {
+            await writer.WriteLineAsync(line);
         }
     }
 }

@@ -30,12 +30,12 @@ public class ExtractOptions
         if (PageTitle != null)
         {
             WikiParseResponse response = await GetWikiDocumentFromTitle(PageTitle);
-            tokens = await extractor.Extract(response.Text);
+            tokens = await extractor.Extract(response.Parse.Text);
         }
         else if (PageId >= 0)
         {
             WikiParseResponse response = await GetWikiDocumentFromId(PageId);
-            tokens = await extractor.Extract(response.Text);
+            tokens = await extractor.Extract(response.Parse.Text);
         }
         else if (Html != null)
         {

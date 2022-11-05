@@ -2,6 +2,7 @@ namespace Atlas.Console.Commands.WikiApi;
 
 using System;
 using System.Text.Json;
+using Atlas.Console.Services;
 using Atlas.Core.Wiki.Data;
 using Atlas.Core.Wiki.Data.Models;
 using CommandLine;
@@ -56,7 +57,7 @@ public class PageContentOptions
 
     private async Task WriteToFile(WikiParseResponse response, string fileName)
     {
-        using var outStream = CreateFile(fileName);
+        using var outStream = FileUtilities.CreateFile(fileName);
         await outStream.WriteAsync(JsonSerializer.Serialize(response,
             new JsonSerializerOptions
             {
@@ -67,19 +68,19 @@ public class PageContentOptions
 
     private void WriteToConsole(WikiParseResponse response)
     {
-        Console.WriteLine($"Found page {response.Title}");
-        if (response.Redirects.Count() > 0)
+        Console.WriteLine($"Found page {response.Parse.Title}");
+        if (response.Parse.Redirects.Count() > 0)
         {
             Console.WriteLine($"Page with id {PageId} is a redirect page");
-            foreach (var redirect in response.Redirects)
+            foreach (var redirect in response.Parse.Redirects)
             {
                 Console.WriteLine($"\tFrom: {redirect.From}, To: {redirect.To}");
             }
         }
         Console.WriteLine("============================");
-        Console.WriteLine($"Title: {response.Title}");
+        Console.WriteLine($"Title: {response.Parse.Title}");
         Console.WriteLine("Categories: ");
-        foreach (var category in response.Categories)
+        foreach (var category in response.Parse.Categories)
         {
             if (category.Hidden && DisplayHidden)
             {
@@ -91,16 +92,6 @@ public class PageContentOptions
             }
         }
         Console.WriteLine("Text: ");
-        Console.WriteLine(response.Text);
-    }
-
-    private TextWriter CreateFile(string path)
-    {
-        string? directory = Path.GetDirectoryName(path);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-        return File.CreateText(path);
+        Console.WriteLine(response.Parse.Text);
     }
 }

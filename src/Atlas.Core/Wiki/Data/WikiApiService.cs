@@ -10,7 +10,6 @@ namespace Atlas.Core.Wiki.Data;
 /// Exposes methods to retrieve wikipedia page data from the api and deserializes responses
 /// to defined models
 /// </summary>
-// TODO: Add handing for warnings
 public class WikiApiService
 {
     private readonly (string, string)[] defaultQueryParams = new (string, string)[] {
@@ -18,8 +17,7 @@ public class WikiApiService
         ( "formatversion", "2" ),
         ( "errorformat", "plaintext" )
     };
-    private readonly JsonSerializerOptions deserializeOptions
-        = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+    private readonly JsonSerializerOptions deserializeOptions = new(JsonSerializerDefaults.Web);
     private const string errorsKey = "errors";
     private const string queryKey = "query";
     private const string pagesKey = "pages";
@@ -48,7 +46,7 @@ public class WikiApiService
     /// </exception>
     /// <exception cref="InvalidOperationException">If request already set</exception>
     /// <exception cref="WikiApiException">If response is an error response as defined by mediawiki</exception>
-    public async Task<WikiPageBatchResponse> GetPages(
+    public async Task<WikiGetPageResponse> GetPages(
         string continueFrom = "",
         int minBytesPerPage = defaultMinBytesPerPage,
         int maxPages = defaultMaxPages,
@@ -65,7 +63,7 @@ public class WikiApiService
         {
             queryParams = queryParams.Append(("gapcontinue", continueFrom));
         }
-        return await GetWikiResponse<WikiPageBatchResponse>(queryParams, cancellationToken);
+        return await GetWikiResponse<WikiGetPageResponse>(queryParams, cancellationToken);
     }
 
     public async Task<WikiParseResponse> ParsePageFromIdAsync(string pageId, CancellationToken cancellationToken = default)
@@ -107,7 +105,8 @@ public class WikiApiService
         response.EnsureSuccessStatusCode();
         var wikiResponse = await response.Content.ReadFromJsonAsync<T>(deserializeOptions);
         string requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
-        if (wikiResponse == null || wikiResponse.Errors.Any())
+
+        if (wikiResponse == null || AnyErrorsPresent(wikiResponse))
         {
             throw new WikiApiException(
                 $"Request {requestUri} failed with errors",
@@ -116,4 +115,7 @@ public class WikiApiService
         }
         return wikiResponse;
     }
+
+    private bool AnyErrorsPresent(BaseWikiResponse wikiResponse) =>
+        wikiResponse.Errors != null && wikiResponse.Errors.Any();
 }

@@ -64,18 +64,16 @@ public class WikiPageBatchResponseConverterTests
         Assert.NotNull(converted);
         Assert.True(converted.Continue == "");
         Assert.True(!converted.Pages.Any());
-        Assert.True(converted.Errors.Count() == 2);
-        Assert.True(converted.Errors.First() == new WikiError(
+        Assert.True(converted.Errors!.Count() == 2);
+        Assert.True(converted.Errors!.First() == new WikiError(
             Code: "badvalue",
             Text: @"Unrecognized value for parameter ""action"": quer.",
-            Module: "main",
-            IsWarning: false
+            Module: "main"
         ));
-        Assert.True(converted.Errors.Last() == new WikiError(
+        Assert.True(converted.Errors!.Last() == new WikiError(
             Code: "ratelimit",
             Text: "Test text",
-            Module: "module",
-            IsWarning: false
+            Module: "module"
         ));
     }
 
@@ -128,18 +126,17 @@ public class WikiPageBatchResponseConverterTests
         Assert.True(converted.Pages.First().PageId == 2538127);
         Assert.True(converted.Pages.Last().PageId == 52243591);
 
-        Assert.True(converted.Errors.Count() == 2);
-        Assert.True(converted.Errors.First() == new WikiError(
+        Assert.True(converted.Errors!.Count() == 1);
+        Assert.True(converted.Warnings!.Count() == 1);
+        Assert.True(converted.Errors!.First() == new WikiError(
             Code: "badvalue",
             Text: @"Unrecognized value for parameter ""action"": quer.",
-            Module: "main",
-            IsWarning: false
+            Module: "main"
         ));
-        Assert.True(converted.Errors.Last() == new WikiError(
+        Assert.True(converted.Warnings!.First() == new WikiError(
             Code: "ratelimit",
             Text: "Test text",
-            Module: "module",
-            IsWarning: true
+            Module: "module"
         ));
     }
 }
