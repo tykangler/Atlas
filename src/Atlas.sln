@@ -13,6 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{646FE635
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Console", "Atlas.Console\Atlas.Console.csproj", "{D0158E87-55EF-49B8-BBBA-B0FF9A548463}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Web", "Atlas.Web\Atlas.Web.csproj", "{BE78CF69-A64A-4234-A43B-DD28B07A389D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Web.Tests", "Atlas.Web.Tests\Atlas.Web.Tests.csproj", "{9A847364-6E9E-4051-A0B0-4377FF703C7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atlas.Infrastructure.Tests", "Atlas.Infrastructure.Tests\Atlas.Infrastructure.Tests.csproj", "{73B39C03-151F-490E-BEB4-5B96CB994681}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,8 +44,22 @@ Global
 		{D0158E87-55EF-49B8-BBBA-B0FF9A548463}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0158E87-55EF-49B8-BBBA-B0FF9A548463}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0158E87-55EF-49B8-BBBA-B0FF9A548463}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE78CF69-A64A-4234-A43B-DD28B07A389D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE78CF69-A64A-4234-A43B-DD28B07A389D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE78CF69-A64A-4234-A43B-DD28B07A389D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE78CF69-A64A-4234-A43B-DD28B07A389D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A847364-6E9E-4051-A0B0-4377FF703C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A847364-6E9E-4051-A0B0-4377FF703C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A847364-6E9E-4051-A0B0-4377FF703C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A847364-6E9E-4051-A0B0-4377FF703C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73B39C03-151F-490E-BEB4-5B96CB994681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73B39C03-151F-490E-BEB4-5B96CB994681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73B39C03-151F-490E-BEB4-5B96CB994681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73B39C03-151F-490E-BEB4-5B96CB994681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3C002C58-6991-4A36-861D-F4E3E023B969} = {646FE635-D73F-4CB1-886C-42AF26A1F5F3}
+		{9A847364-6E9E-4051-A0B0-4377FF703C7E} = {646FE635-D73F-4CB1-886C-42AF26A1F5F3}
+		{73B39C03-151F-490E-BEB4-5B96CB994681} = {646FE635-D73F-4CB1-886C-42AF26A1F5F3}
 	EndGlobalSection
 EndGlobal
