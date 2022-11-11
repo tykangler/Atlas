@@ -3,9 +3,9 @@ namespace Atlas.Console.Commands.WikiApi;
 using System;
 using System.Diagnostics;
 using CommandLine;
-using Atlas.Core.Wiki.Data;
+using Atlas.Core.Wiki;
 using Atlas.Core.Exceptions;
-using Atlas.Core.Wiki.Data.Models;
+using Atlas.Core.Wiki.Models;
 using Atlas.Console.Services;
 
 [Verb("wiki-get-page", HelpText = "Get Wikipedia page ids")]

@@ -5,8 +5,8 @@ using CommandLine;
 using Atlas.Core.Wiki.Extract;
 using Atlas.Console.Services;
 using Atlas.Core.Wiki.Extract.AST;
-using Atlas.Core.Wiki.Data;
-using Atlas.Core.Wiki.Data.Models;
+using Atlas.Core.Wiki;
+using Atlas.Core.Wiki.Models;
 
 [Verb("extract", HelpText = "extract wikipedia html documents into token list")]
 public class ExtractOptions

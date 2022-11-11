@@ -2,9 +2,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Atlas.Core.Exceptions;
 using Atlas.Core.Extensions;
-using Atlas.Core.Wiki.Data.Models;
+using Atlas.Core.Wiki.Models;
 
-namespace Atlas.Core.Wiki.Data;
+namespace Atlas.Core.Wiki;
 
 /// <summary>
 /// Exposes methods to retrieve wikipedia page data from the api and deserializes responses

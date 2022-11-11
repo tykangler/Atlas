@@ -3,8 +3,8 @@ namespace Atlas.Console.Commands.WikiApi;
 using System;
 using System.Text.Json;
 using Atlas.Console.Services;
-using Atlas.Core.Wiki.Data;
-using Atlas.Core.Wiki.Data.Models;
+using Atlas.Core.Wiki;
+using Atlas.Core.Wiki.Models;
 using CommandLine;
 
 [Verb("wiki-page-content", HelpText = "Parse a page given a page id")]

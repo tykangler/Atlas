@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Data.Models;
+namespace Atlas.Core.Wiki.Models;
 
 public record WikiParse(
     string Title,
