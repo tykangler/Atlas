@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Extract.AST;
+namespace Atlas.Core.Wiki.Parse.AST;
 
 /// <summary>
 /// Traversal visitor for Wiki Abstract Syntax Tree. Defines operations 

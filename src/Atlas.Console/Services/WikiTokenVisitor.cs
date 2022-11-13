@@ -1,6 +1,6 @@
 namespace Atlas.Console.Services;
 
-using Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Parse.AST;
 
 public class WikiTokenVisitor : ASTVisitor
 {

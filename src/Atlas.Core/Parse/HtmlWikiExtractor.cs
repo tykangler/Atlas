@@ -1,16 +1,16 @@
-namespace Atlas.Core.Wiki.Extract;
+namespace Atlas.Core.Wiki.Parse;
 
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Atlas.Core.Extensions;
-using Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Parse.AST;
 
 /// <summary>
 /// Parses through an html page from wikipedia and builds an ordered collection of WikiNode's
 /// with respect to their order in the wikipedia document.
 /// WikiTokenType 
 /// </summary>
-public class HtmlWikiExtractor : IWikiExtractor
+public class HtmlWikiParser : IWikiParser
 {
     private readonly string[] disallowClasses = {
         "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
@@ -19,7 +19,7 @@ public class HtmlWikiExtractor : IWikiExtractor
 
     private HtmlParser htmlParser;
 
-    public HtmlWikiExtractor()
+    public HtmlWikiParser()
     {
         htmlParser = new HtmlParser(new HtmlParserOptions
         {

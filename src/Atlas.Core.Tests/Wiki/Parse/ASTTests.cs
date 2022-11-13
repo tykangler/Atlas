@@ -1,4 +1,4 @@
-using Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Parse.AST;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Xunit.Abstractions;

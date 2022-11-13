@@ -1,8 +1,7 @@
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Extract.AST;
+namespace Atlas.Core.Wiki.Parse.AST;
 
 public class LinkNode : WikiNode
 {

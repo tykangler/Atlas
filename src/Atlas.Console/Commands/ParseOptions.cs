@@ -2,13 +2,13 @@ namespace Atlas.Console.Commands;
 
 using System;
 using CommandLine;
-using Atlas.Core.Wiki.Extract;
+using Atlas.Core.Wiki.Parse;
 using Atlas.Console.Services;
-using Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Parse.AST;
 using Atlas.Core.Wiki;
 using Atlas.Core.Wiki.Models;
 
-[Verb("extract", HelpText = "extract wikipedia html documents into token list")]
+[Verb("parse", HelpText = "parse wikipedia html documents into token list")]
 public class ExtractOptions
 {
     [Option('t', "title", HelpText = "page title of wikipedia document (mutually exclusive with page id and html)", SetName = "title")]
@@ -25,7 +25,7 @@ public class ExtractOptions
 
     public async Task Callback()
     {
-        var extractor = new HtmlWikiExtractor();
+        var extractor = new HtmlWikiParser();
         var tokens = Enumerable.Empty<WikiNode>();
         if (PageTitle != null)
         {

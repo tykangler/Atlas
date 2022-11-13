@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Extract.AST;
+namespace Atlas.Core.Wiki.Parse.AST;
 
 public class TextNode : WikiNode
 {

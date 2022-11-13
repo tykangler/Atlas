@@ -1,5 +1,5 @@
-using Atlas.Core.Wiki.Extract;
-using Atlas.Core.Wiki.Extract.AST;
+using Atlas.Core.Wiki.Parse;
+using Atlas.Core.Wiki.Parse.AST;
 
 namespace Atlas.Core.Tests.Wiki.Parse;
 
@@ -9,7 +9,7 @@ public class IWikiExtractorTests
     [Fact]
     public async Task WhenInputIsSingleLevel_CorrectOutputIsProduced()
     {
-        IWikiExtractor extractor = new HtmlWikiExtractor();
+        IWikiParser extractor = new HtmlWikiParser();
         string inputDocument = $@"
             <div class='container'> 
                 <a href='/wiki/test-link'>
@@ -48,7 +48,7 @@ public class IWikiExtractorTests
     [Fact]
     public async Task WhenInputHasInvalidElements_InvalidElementAndChildElementsAreSkipped()
     {
-        IWikiExtractor extractor = new HtmlWikiExtractor();
+        IWikiParser extractor = new HtmlWikiParser();
         string inputDocument = @$"
             <div class='container'>
                 <a href='google.com'>Hello world</a>
@@ -76,7 +76,7 @@ public class IWikiExtractorTests
     [Fact]
     public async Task WhenInputHasMultipleLevels_CorrectOutputIsProduced()
     {
-        IWikiExtractor extractor = new HtmlWikiExtractor();
+        IWikiParser extractor = new HtmlWikiParser();
         string inputDocument = @$"
             <div class='container'>
                 <a href='/wiki/test-link'>test link</a>
@@ -120,7 +120,7 @@ public class IWikiExtractorTests
     [Fact]
     public async Task WhenInputHasTextElementsSandwichingInvalidElement_TextElementsAreMerged()
     {
-        IWikiExtractor extractor = new HtmlWikiExtractor();
+        IWikiParser extractor = new HtmlWikiParser();
         string inputDocument = @$"
             <div class='container'>
                 Hello world   

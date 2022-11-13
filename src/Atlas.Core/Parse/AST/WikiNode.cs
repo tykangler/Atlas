@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Extract.AST;
+namespace Atlas.Core.Wiki.Parse.AST;
 
 public abstract class WikiNode
 {
