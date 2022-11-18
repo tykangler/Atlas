@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package Atlas.EntityRelationshipExtractor;
+
+// Interface exported by the server.
+service EntityRelationshipExtractor {
+    rpc ExtractFromDocument(Document) returns (ExtractResponse);
+}
+
+enum NodeType {
+    LINK = 0;
+    LIST = 1;
+    SECTION = 2;
+    TABLE = 3;
+    TEXT = 4;
+}
+
+message Document {
+    repeated Node nodes = 1;
+}
+
+message Node {
+    NodeType type = 1;
+    oneof fields {
+        LinkProps link_props = 2;
+        ListProps list_props = 3;
+        SectionProps section_props = 4;
+        TableProps table_props = 5;
+        TextProps text_props = 6;
+    }
+}
+
+message LinkProps {
+    string url = 1;
+    string value = 2;
+    bool is_interlink = 3;
+}
+
+message ListProps {
+    Node list_items = 1;
+}
+
+message SectionProps {
+    string value = 1;
+}
+
+message TableProps {
+    repeated string table_headers = 1;
+    repeated string table_data = 2;
+}
+
+message TextProps {
+    string value = 1;
+}
+
+message ExtractResponse {
+    // delimit by sentence
+    // need to know pronoun resolutions
+    // for each sentence, get referenced entity if any, 
+}

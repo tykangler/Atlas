@@ -30,8 +30,8 @@ Entities should be capable of holding multiple relationships.
 ### Directional, backtrack-able
 
 Relationships should be directional to indicate relationships such as parent-child. For example, "Suzanne Collins wrote The Hunger Games" should
-be modeled as `Suzanne Collins --wrote--> The Hunger Games`. If we want to find the writer of the Hunger Games, we should be able to backtrack
-the relationship, so we can extend the model further: `The Hunger Games --was written by--> Suzanne Collins`. This means the number of edges is
+be modeled as `Suzanne Collins -wrote--> The Hunger Games`. If we want to find the writer of the Hunger Games, we should be able to backtrack
+the relationship, so we can extend the model further: `The Hunger Games -was written by--> Suzanne Collins`. This means the number of edges is
 2x the number of relationships. Consider memory.
 
 ### Language Model
