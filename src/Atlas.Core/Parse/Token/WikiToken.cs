@@ -1,8 +1,8 @@
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
-public abstract class WikiNode
+public abstract class WikiToken
 {
-    public abstract void Accept(ASTVisitor visitor);
+    public abstract void Accept(TokenVisitor visitor);
 }
 
 

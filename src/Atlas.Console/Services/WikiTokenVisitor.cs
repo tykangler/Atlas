@@ -1,8 +1,8 @@
 namespace Atlas.Console.Services;
 
-using Atlas.Core.Wiki.Parse.AST;
+using Atlas.Core.Wiki.Parse.Token;
 
-public class WikiTokenVisitor : ASTVisitor
+public class WikiTokenVisitor : TokenVisitor
 {
     private TextWriter writer;
 

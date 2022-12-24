@@ -1,5 +1,5 @@
 using Atlas.Core.Wiki.Parse;
-using Atlas.Core.Wiki.Parse.AST;
+using Atlas.Core.Wiki.Parse.Token;
 
 namespace Atlas.Core.Tests.Wiki.Parse;
 

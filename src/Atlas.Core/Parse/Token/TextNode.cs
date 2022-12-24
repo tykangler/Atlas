@@ -1,9 +1,9 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
-public class TextNode : WikiNode
+public class TextNode : WikiToken
 {
     public string Value { get; }
 
@@ -27,7 +27,7 @@ public class TextNode : WikiNode
 
     public TextNode(string value) => this.Value = value;
 
-    public override void Accept(ASTVisitor visitor)
+    public override void Accept(TokenVisitor visitor)
     {
         visitor.VisitText(this);
     }

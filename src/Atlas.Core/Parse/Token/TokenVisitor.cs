@@ -1,14 +1,14 @@
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
 /// <summary>
-/// Traversal visitor for Wiki Abstract Syntax Tree. Defines operations 
-/// allowed on the AST for each node type. 
+/// Traversal visitor for Wiki Token Tree. Defines operations 
+/// allowed on the tree for each node type. 
 /// </summary>
 /// <remark>
 /// Abstract class with virtual members so that subclasses can choose which methods to override.
 /// If not overridden, then use default impl.
 /// </remark>
-public abstract class ASTVisitor
+public abstract class TokenVisitor
 {
     // will be ignoring infoboxes for now, no reliable way to extract information
     // tried dbpedia + wikidata. will maybe revisit in the future

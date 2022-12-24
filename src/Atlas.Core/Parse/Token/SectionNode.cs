@@ -1,9 +1,9 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
-public class SectionNode : WikiNode
+public class SectionNode : WikiToken
 {
     private const string sectionHeadingClass = "mw-headline";
 
@@ -25,5 +25,5 @@ public class SectionNode : WikiNode
 
     public SectionNode(string value) => Value = value;
 
-    public override void Accept(ASTVisitor visitor) => visitor.VisitSection(this);
+    public override void Accept(TokenVisitor visitor) => visitor.VisitSection(this);
 }

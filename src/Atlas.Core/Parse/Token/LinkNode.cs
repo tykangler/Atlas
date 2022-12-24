@@ -1,9 +1,9 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
-public class LinkNode : WikiNode
+public class LinkNode : WikiToken
 {
     private const string href = "href";
 
@@ -42,5 +42,5 @@ public class LinkNode : WikiNode
         IsInterlink = isInterlink;
     }
 
-    public override void Accept(ASTVisitor visitor) => visitor.VisitLink(this);
+    public override void Accept(TokenVisitor visitor) => visitor.VisitLink(this);
 }

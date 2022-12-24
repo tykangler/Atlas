@@ -1,8 +1,8 @@
 using AngleSharp.Dom;
 
-namespace Atlas.Core.Wiki.Parse.AST;
+namespace Atlas.Core.Wiki.Parse.Token;
 
-public class TableNode : WikiNode
+public class TableNode : WikiToken
 {
     public IEnumerable<string> TableHeaders { get; }
     public IEnumerable<string> TableData { get; }
@@ -24,5 +24,5 @@ public class TableNode : WikiNode
         TableData = data;
     }
 
-    public override void Accept(ASTVisitor visitor) => throw new NotImplementedException();
+    public override void Accept(TokenVisitor visitor) => throw new NotImplementedException();
 }

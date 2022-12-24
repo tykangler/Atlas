@@ -1,4 +1,4 @@
-using Atlas.Core.Wiki.Parse.AST;
+using Atlas.Core.Wiki.Parse.Token;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Xunit.Abstractions;
@@ -8,8 +8,8 @@ namespace Atlas.Core.Tests.Wiki.Extract;
 
 public class ASTTests
 {
-    private readonly Func<IElement, List<WikiNode>> testExtractFunc = elem =>
-        new List<WikiNode> { new TextNode(elem.TextContent) };
+    private readonly Func<IElement, List<WikiToken>> testExtractFunc = elem =>
+        new List<WikiToken> { new TextNode(elem.TextContent) };
     private readonly ITestOutputHelper output;
 
     public ASTTests(ITestOutputHelper output)

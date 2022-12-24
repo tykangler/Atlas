@@ -4,7 +4,7 @@ using System;
 using CommandLine;
 using Atlas.Core.Wiki.Parse;
 using Atlas.Console.Services;
-using Atlas.Core.Wiki.Parse.AST;
+using Atlas.Core.Wiki.Parse.Token;
 using Atlas.Core.Wiki;
 using Atlas.Core.Wiki.Models;
 
@@ -26,7 +26,7 @@ public class ExtractOptions
     public async Task Callback()
     {
         var extractor = new HtmlWikiParser();
-        var tokens = Enumerable.Empty<WikiNode>();
+        var tokens = Enumerable.Empty<WikiToken>();
         if (PageTitle != null)
         {
             WikiParseResponse response = await GetWikiDocumentFromTitle(PageTitle);
@@ -47,7 +47,7 @@ public class ExtractOptions
             return;
         }
         using var textWriter = OutputFile == null ? Console.Out : CreateFile(OutputFile);
-        ASTVisitor visitor = new WikiTokenVisitor(textWriter);
+        TokenVisitor visitor = new WikiTokenVisitor(textWriter);
         foreach (var token in tokens)
         {
             token.Accept(visitor);

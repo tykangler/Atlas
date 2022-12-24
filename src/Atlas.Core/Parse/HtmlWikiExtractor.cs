@@ -3,10 +3,10 @@ namespace Atlas.Core.Wiki.Parse;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Atlas.Core.Extensions;
-using Atlas.Core.Wiki.Parse.AST;
+using Atlas.Core.Wiki.Parse.Token;
 
 /// <summary>
-/// Parses through an html page from wikipedia and builds an ordered collection of WikiNode's
+/// Parses through an html page from wikipedia and builds an ordered collection of WikiToken's
 /// with respect to their order in the wikipedia document.
 /// WikiTokenType 
 /// </summary>
@@ -27,7 +27,7 @@ public class HtmlWikiParser : IWikiParser
         });
     }
 
-    public async Task<IEnumerable<WikiNode>> Extract(string htmlDoc)
+    public async Task<IEnumerable<WikiToken>> Extract(string htmlDoc)
     {
         var document = await this.htmlParser.ParseDocumentAsync(htmlDoc);
         if (document.Body?.FirstElementChild != null)
@@ -35,15 +35,15 @@ public class HtmlWikiParser : IWikiParser
             // build node list
             return ExtractFromHtml(document.Body.FirstElementChild); // div.mw-parser-output
         }
-        return Enumerable.Empty<WikiNode>();
+        return Enumerable.Empty<WikiToken>();
     }
 
 
     // design: Find better way to set text values that don't involve creating new objects
     // FIXME: Filter out unallowed tags and classes in node parsing methods (list)
-    private List<WikiNode> ExtractFromHtml(IElement htmlElement)
+    private List<WikiToken> ExtractFromHtml(IElement htmlElement)
     {
-        List<WikiNode> wikiNodes = new();
+        List<WikiToken> wikiNodes = new();
         foreach (var childHtmlNode in htmlElement.ChildNodes)
         {
             if (TextNode.TryParse(childHtmlNode) is TextNode textNode)
@@ -94,7 +94,7 @@ public class HtmlWikiParser : IWikiParser
 
     private TextNode MergeTextNodes(TextNode node1, TextNode node2) => new TextNode($"{node1.Value} {node2.Value}");
 
-    private void AddRangeAndMergeTextNodes(List<WikiNode> wikiNodes, List<WikiNode> toAdd)
+    private void AddRangeAndMergeTextNodes(List<WikiToken> wikiNodes, List<WikiToken> toAdd)
     {
         if (toAdd.Count > 0 && toAdd[0] is TextNode textNode &&
             wikiNodes.Count > 0 && wikiNodes[^1] is TextNode lastTextNode)
