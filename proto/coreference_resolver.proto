@@ -1,0 +1,60 @@
+// the coference resolver doesn't need to take in a whole token list. It doesn't need to know
+// whether something is a list, or an interlink, or a table, or a section. 
+// It's only job will be to resolve coreferences within a block of text and resolve them to a noun phrase.
+
+// Leave the job of cleaning the input to the caller. 
+// + lists should be sent one item at a time
+// + tables should not be sent
+// + sections should not be sent
+// + links should be converted to text
+
+// Ideally we'll send a plaintext article. But how do we map a list of tokens to a plaintext article, then map the resulting
+// article back into a list of tokens. 
+
+// So maybe we do just send a list of tokens in the end. The result will be a list of tokens marking nouns that are coreferences and the 
+// antecedents they are most likely to resolve to
+
+// but the messages can be simpler. We only need a plaintext tokens. The delimiter will be the token delimiters, just without the extra
+// information about url, etc... 
+
+// how about list items? These are structured like a tree. When iterating through the response, and iterating through the token list. We
+// can see the start of the list, and determine whether the response is referring to a list item.
+
+// either that or we can send list items as part of a separate request. NO.
+
+// concern: We are excluding text when we do the initial token parsing. There is a chance that we leave out antecedents and the coreferences resolve to 
+// the incorrect antecedent. It shouldn't be a problem though. We aren't excluding anything important, just tables, and citations, etc.
+
+// resolving coreferences: There is a whole process outlined in resolving_coreferences.ipynb. But it's complex. We know the article subject, can just find that
+// to determine the antecedent.
+
+syntax = "proto3";
+
+package Atlas.CoreferenceResolver;
+
+// Interface exported by the server.
+service CoreferenceResolver {
+    rpc ResolveAntecedents(stream string) returns (stream ResolvedToken);
+}
+
+message ResolvedToken {
+    string value = 1;
+    // NEED A WAY TO LINK BACK TO THE ACTUAL ANTECEDENT, INDICES?? ([<index_token>, <index_word_start>, <index_word_end>]),
+    // do we need to track all coreferences?? Or just the ones before it.
+    // since we're only iterating forwards, maybe just link to the coreferences before it. 
+    // 9 times out of 10, the antecedent will the first word. But there are cases such as when independent clauses follow
+    // dependent clauses. (<dep_clause> <indep_clause>), where this is not true. 
+    // While he was walking, John saw a dog. 
+    // AllenNLP also fails in identifying the antecedent here as well.
+    // So actually the ideal solution would be to just find the noun phrase/article subject. 
+    // Just finding the noun phrase might not work because of phrases like "the species" when referring to Gorillas. "The species"
+    // is not the antecedent, "Gorillas" is. 
+    // in the case of dep-indep clauses, we can still refer backwards.
+    // we need another parameter to mark whether it is antecedent.
+    // NO, we just need to cluster the tokens if we are finding subject. This simplifies the task here. And delegates antecedent finding
+    // to the calling process. Cluster the tokens by linking coreferences backwards using ([<index_token>, <index_word_start>, <index_word_end>])
+
+    // ANOTHER OPTION TO RESOLVE CORFERENCES: SPACY + FCOREF , can also revisit SPACY + COREFEREE. Profile performance and analyze results.
+}
+
+message Resolved
