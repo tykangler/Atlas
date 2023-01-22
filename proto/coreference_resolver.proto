@@ -33,28 +33,22 @@ syntax = "proto3";
 package Atlas.CoreferenceResolver;
 
 // Interface exported by the server.
+/* resolve coreferences given a stream of tokens and returns a stream of coreference clusters with antecedents notated. */
 service CoreferenceResolver {
-    rpc ResolveAntecedents(stream string) returns (stream ResolvedToken);
+    rpc ResolveAntecedents(TokenRequest) returns (stream CorefCluster);
 }
 
-message ResolvedToken {
-    string value = 1;
-    // NEED A WAY TO LINK BACK TO THE ACTUAL ANTECEDENT, INDICES?? ([<index_token>, <index_word_start>, <index_word_end>]),
-    // do we need to track all coreferences?? Or just the ones before it.
-    // since we're only iterating forwards, maybe just link to the coreferences before it. 
-    // 9 times out of 10, the antecedent will the first word. But there are cases such as when independent clauses follow
-    // dependent clauses. (<dep_clause> <indep_clause>), where this is not true. 
-    // While he was walking, John saw a dog. 
-    // AllenNLP also fails in identifying the antecedent here as well.
-    // So actually the ideal solution would be to just find the noun phrase/article subject. 
-    // Just finding the noun phrase might not work because of phrases like "the species" when referring to Gorillas. "The species"
-    // is not the antecedent, "Gorillas" is. 
-    // in the case of dep-indep clauses, we can still refer backwards.
-    // we need another parameter to mark whether it is antecedent.
-    // NO, we just need to cluster the tokens if we are finding subject. This simplifies the task here. And delegates antecedent finding
-    // to the calling process. Cluster the tokens by linking coreferences backwards using ([<index_token>, <index_word_start>, <index_word_end>])
-
-    // ANOTHER OPTION TO RESOLVE CORFERENCES: SPACY + FCOREF , can also revisit SPACY + COREFEREE. Profile performance and analyze results.
+message TokenRequest {
+    repeated string tokens = 1;
 }
 
-message Resolved
+message CorefMention {
+    int32 token_index = 1;
+    int32 start_mention = 2;
+    int32 end_mention = 3;
+}
+
+message CorefCluster {
+    repeated CorefMention mention = 1;
+    CorefMention antecedent = 2;
+}

@@ -188,3 +188,6 @@ Can't use neo4j embedded with .net, so let's use just a simple file that we'll l
 Must use Python for language parsing. Everything else will be in C#. 
 To run interop between python and C#, use named pipes (FIFO) with a Python server and C sharp client. Or could do the other way around, doesn't matter. Named
 pipes support bi-directional communication. Let's do C sharp server because it will be accepting data, for semantics.
+
+## Other Notes
+Coreference resolver has to be the last step because resolving html should be the first step. Coreference resolver will return list of clusters with antecedent.
