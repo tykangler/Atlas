@@ -6,12 +6,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CorefCluster(_message.Message):
-    __slots__ = ["antecedent", "mention"]
+    __slots__ = ["antecedent", "mentions"]
     ANTECEDENT_FIELD_NUMBER: _ClassVar[int]
-    MENTION_FIELD_NUMBER: _ClassVar[int]
+    MENTIONS_FIELD_NUMBER: _ClassVar[int]
     antecedent: CorefMention
-    mention: _containers.RepeatedCompositeFieldContainer[CorefMention]
-    def __init__(self, mention: _Optional[_Iterable[_Union[CorefMention, _Mapping]]] = ..., antecedent: _Optional[_Union[CorefMention, _Mapping]] = ...) -> None: ...
+    mentions: _containers.RepeatedCompositeFieldContainer[CorefMention]
+    def __init__(self, mentions: _Optional[_Iterable[_Union[CorefMention, _Mapping]]] = ..., antecedent: _Optional[_Union[CorefMention, _Mapping]] = ...) -> None: ...
 
 class CorefMention(_message.Message):
     __slots__ = ["end_mention", "start_mention", "token_index"]

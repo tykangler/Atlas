@@ -49,6 +49,6 @@ message CorefMention {
 }
 
 message CorefCluster {
-    repeated CorefMention mention = 1;
+    repeated CorefMention mentions = 1;
     CorefMention antecedent = 2;
 }
