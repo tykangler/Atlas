@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Parse.Token;
+namespace Atlas.Core.Wiki.Annotator.Token;
 
 /// <summary>
 /// Traversal visitor for Wiki Token Tree. Defines operations 

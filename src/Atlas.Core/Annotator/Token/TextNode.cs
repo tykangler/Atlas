@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Parse.Token;
+namespace Atlas.Core.Wiki.Annotator.Token;
 
 public class TextNode : WikiToken
 {

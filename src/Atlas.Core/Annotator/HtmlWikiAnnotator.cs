@@ -1,16 +1,16 @@
-namespace Atlas.Core.Wiki.Parse;
+namespace Atlas.Core.Wiki.Annotator;
 
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Atlas.Core.Extensions;
-using Atlas.Core.Wiki.Parse.Token;
+using Atlas.Core.Wiki.Annotator.Token;
 
 /// <summary>
 /// Parses through an html page from wikipedia and builds an ordered collection of WikiToken's
 /// with respect to their order in the wikipedia document.
 /// WikiTokenType 
 /// </summary>
-public class HtmlWikiParser : IWikiParser
+public class HtmlWikiAnotator : IHtmlAnnotator
 {
     private readonly string[] disallowClasses = {
         "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
@@ -19,7 +19,7 @@ public class HtmlWikiParser : IWikiParser
 
     private HtmlParser htmlParser;
 
-    public HtmlWikiParser()
+    public HtmlWikiAnotator()
     {
         htmlParser = new HtmlParser(new HtmlParserOptions
         {

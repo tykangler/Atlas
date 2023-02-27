@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
 
-namespace Atlas.Core.Wiki.Parse.Token;
+namespace Atlas.Core.Wiki.Annotator.Token;
 
 public class TableNode : WikiToken
 {
