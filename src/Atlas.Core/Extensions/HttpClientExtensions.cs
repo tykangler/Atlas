@@ -16,6 +16,6 @@ public static class HttpClientExtensions
         {
             return await client.GetAsync(queryString, cancellationToken);
         }
-        return await client.GetAsync(queryString);
+        return await client.GetAsync(queryString, cancellationToken);
     }
 }

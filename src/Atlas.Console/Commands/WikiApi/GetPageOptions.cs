@@ -3,10 +3,10 @@ namespace Atlas.Console.Commands.WikiApi;
 using System;
 using System.Diagnostics;
 using CommandLine;
-using Atlas.Core.Wiki;
+using Atlas.Core.Services;
 using Atlas.Core.Exceptions;
-using Atlas.Core.Wiki.Models;
 using Atlas.Console.Services;
+using Atlas.Core.Clients.Wiki.Models;
 
 [Verb("wiki-get-page", HelpText = "Get Wikipedia page ids")]
 public class GetPageOptions
@@ -75,10 +75,10 @@ public class GetPageOptions
                 PrintTitles ? page.Title : page.PageId.ToString()));
         }
         Console.WriteLine($"{elapsedMilliseconds / 1000.0} seconds elapsed");
-        Console.WriteLine($"{allPages.Count()} pages retrieved");
+        Console.WriteLine($"{allPages.Count} pages retrieved");
     }
 
-    private async Task PrintLines(TextWriter writer, IEnumerable<string> lines)
+    private static async Task PrintLines(TextWriter writer, IEnumerable<string> lines)
     {
         foreach (var line in lines)
         {

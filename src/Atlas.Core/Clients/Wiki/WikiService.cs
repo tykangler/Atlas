@@ -2,9 +2,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Atlas.Core.Exceptions;
 using Atlas.Core.Extensions;
-using Atlas.Core.Wiki.Models;
+using Atlas.Core.Clients.Wiki.Models;
 
-namespace Atlas.Core.Wiki;
+namespace Atlas.Core.Services;
 
 /// <summary>
 /// Exposes methods to retrieve wikipedia page data from the api and deserializes responses
@@ -18,14 +18,10 @@ public class WikiApiService
         ( "errorformat", "plaintext" )
     };
     private readonly JsonSerializerOptions deserializeOptions = new(JsonSerializerDefaults.Web);
-    private const string errorsKey = "errors";
-    private const string queryKey = "query";
-    private const string pagesKey = "pages";
-    private const string pageIdKey = "pageid";
     private const int defaultMinBytesPerPage = 17000;
     private const int defaultMaxPages = 500;
 
-    private HttpClient httpClient;
+    private readonly HttpClient httpClient;
 
     // use typed client in di config
     public WikiApiService(HttpClient httpClient)
@@ -103,7 +99,7 @@ public class WikiApiService
     {
         var response = await this.httpClient.GetWithQueryAsync(queryParams, cancellationToken);
         response.EnsureSuccessStatusCode();
-        var wikiResponse = await response.Content.ReadFromJsonAsync<T>(deserializeOptions);
+        var wikiResponse = await response.Content.ReadFromJsonAsync<T>(deserializeOptions, cancellationToken: cancellationToken);
         string requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "<unknown>";
 
         if (wikiResponse == null || AnyErrorsPresent(wikiResponse))
@@ -116,6 +112,6 @@ public class WikiApiService
         return wikiResponse;
     }
 
-    private bool AnyErrorsPresent(BaseWikiResponse wikiResponse) =>
+    private static bool AnyErrorsPresent(BaseWikiResponse wikiResponse) =>
         wikiResponse.Errors != null && wikiResponse.Errors.Any();
 }

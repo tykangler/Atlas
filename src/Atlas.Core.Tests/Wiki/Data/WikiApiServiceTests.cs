@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Atlas.Core.Exceptions;
-using Atlas.Core.Wiki;
-using Atlas.Core.Wiki.Models;
+using Atlas.Core.Services;
+using Atlas.Core.Clients.Wiki.Models;
 
 namespace Atlas.Core.Tests.Wiki.Data;
 

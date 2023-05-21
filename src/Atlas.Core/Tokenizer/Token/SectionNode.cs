@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Annotator.Token;
+namespace Atlas.Core.Tokenizer.Token;
 
 public class SectionNode : WikiToken
 {
@@ -9,16 +9,16 @@ public class SectionNode : WikiToken
 
     public string Value { get; }
 
-    private static bool Validate(IElement elem)
+    private static bool Validate(INode node)
     {
-        return elem.ClassList.Contains(sectionHeadingClass);
+        return node is IElement elem && elem.ClassList.Contains(sectionHeadingClass);
     }
 
-    public static SectionNode? TryParse(IElement elem)
+    public static SectionNode? TryParse(INode node)
     {
-        if (Validate(elem))
+        if (Validate(node))
         {
-            return new SectionNode(elem.Text().NormalizeWhiteSpace());
+            return new SectionNode(node.Text().NormalizeWhiteSpace());
         }
         return null;
     }

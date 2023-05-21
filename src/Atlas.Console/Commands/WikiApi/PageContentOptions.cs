@@ -3,9 +3,9 @@ namespace Atlas.Console.Commands.WikiApi;
 using System;
 using System.Text.Json;
 using Atlas.Console.Services;
-using Atlas.Core.Wiki;
-using Atlas.Core.Wiki.Models;
+using Atlas.Core.Services;
 using CommandLine;
+using Atlas.Core.Clients.Wiki.Models;
 
 [Verb("wiki-page-content", HelpText = "Parse a page given a page id")]
 public class PageContentOptions
@@ -25,7 +25,7 @@ public class PageContentOptions
     public async Task Callback()
     {
         var apiService = new WikiApiService(new HttpClient());
-        WikiParseResponse response = default!;
+        WikiParseResponse response;
         if (PageId >= 0)
         {
             response = await apiService.ParsePageFromIdAsync(PageId.ToString());
@@ -55,7 +55,7 @@ public class PageContentOptions
         }
     }
 
-    private async Task WriteToFile(WikiParseResponse response, string fileName)
+    private static async Task WriteToFile(WikiParseResponse response, string fileName)
     {
         using var outStream = FileUtilities.CreateFile(fileName);
         await outStream.WriteAsync(JsonSerializer.Serialize(response,
@@ -69,7 +69,7 @@ public class PageContentOptions
     private void WriteToConsole(WikiParseResponse response)
     {
         Console.WriteLine($"Found page {response.Parse.Title}");
-        if (response.Parse.Redirects.Count() > 0)
+        if (response.Parse.Redirects.Any())
         {
             Console.WriteLine($"Page with id {PageId} is a redirect page");
             foreach (var redirect in response.Parse.Redirects)

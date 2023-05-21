@@ -2,11 +2,12 @@ namespace Atlas.Console.Commands;
 
 using System;
 using CommandLine;
-using Atlas.Core.Wiki.Parse;
+using Atlas.Core.Tokenizer;
 using Atlas.Console.Services;
-using Atlas.Core.Wiki.Parse.Token;
-using Atlas.Core.Wiki;
-using Atlas.Core.Wiki.Models;
+using Atlas.Core.Services;
+using Atlas.Core.Tokenizer.Token;
+using Atlas.Core.Clients.Wiki.Models;
+using Atlas.Core.Tokenizer.Input;
 
 [Verb("parse", HelpText = "parse wikipedia html documents into token list")]
 public class ExtractOptions
@@ -25,21 +26,30 @@ public class ExtractOptions
 
     public async Task Callback()
     {
-        var extractor = new HtmlWikiParser();
-        var tokens = Enumerable.Empty<WikiToken>();
+        var tokenizer = new HtmlTokenizer();
+        IEnumerable<WikiToken>? tokens;
         if (PageTitle != null)
         {
             WikiParseResponse response = await GetWikiDocumentFromTitle(PageTitle);
-            tokens = await extractor.Extract(response.Parse.Text);
+            tokens = await tokenizer.Tokenize(new HtmlDocument
+            (
+                Content: response.Parse.Text
+            ));
         }
         else if (PageId >= 0)
         {
             WikiParseResponse response = await GetWikiDocumentFromId(PageId);
-            tokens = await extractor.Extract(response.Parse.Text);
+            tokens = await tokenizer.Tokenize(new HtmlDocument
+            (
+                Content: response.Parse.Text
+            ));
         }
         else if (Html != null)
         {
-            tokens = await extractor.Extract(Html);
+            tokens = await tokenizer.Tokenize(new HtmlDocument
+            (
+                Content: Html
+            ));
         }
         else
         {
@@ -54,19 +64,19 @@ public class ExtractOptions
         }
     }
 
-    private async Task<WikiParseResponse> GetWikiDocumentFromId(int pageId)
+    private static async Task<WikiParseResponse> GetWikiDocumentFromId(int pageId)
     {
         var apiService = new WikiApiService(new HttpClient());
         return await apiService.ParsePageFromIdAsync(pageId.ToString());
     }
 
-    private async Task<WikiParseResponse> GetWikiDocumentFromTitle(string pageTitle)
+    private static async Task<WikiParseResponse> GetWikiDocumentFromTitle(string pageTitle)
     {
         var apiService = new WikiApiService(new HttpClient());
         return await apiService.ParsePageFromTitleAsync(pageTitle);
     }
 
-    private TextWriter CreateFile(string path)
+    private static TextWriter CreateFile(string path)
     {
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory))

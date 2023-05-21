@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Annotator.Token;
+namespace Atlas.Core.Tokenizer.Token;
 
 public abstract class WikiToken
 {

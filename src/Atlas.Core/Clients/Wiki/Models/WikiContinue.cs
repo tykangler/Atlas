@@ -1,3 +1,3 @@
-namespace Atlas.Core.Wiki.Models;
+namespace Atlas.Core.Clients.Wiki.Models;
 
 public record WikiContinue(string GapContinue);

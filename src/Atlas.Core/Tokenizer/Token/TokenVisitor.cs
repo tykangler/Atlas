@@ -1,4 +1,4 @@
-namespace Atlas.Core.Wiki.Annotator.Token;
+namespace Atlas.Core.Tokenizer.Token;
 
 /// <summary>
 /// Traversal visitor for Wiki Token Tree. Defines operations 
@@ -18,4 +18,6 @@ public abstract class TokenVisitor
     public virtual void VisitText(TextNode node) { }
     public virtual void VisitSection(SectionNode node) { }
     public virtual void VisitList(ListNode node) { }
+
+    public virtual void VisitListItem(ListItem node) { }
 }

@@ -1,18 +1,18 @@
 using AngleSharp.Dom;
 
-namespace Atlas.Core.Wiki.Annotator.Token;
+namespace Atlas.Core.Tokenizer.Token;
 
 public class TableNode : WikiToken
 {
     public IEnumerable<string> TableHeaders { get; }
     public IEnumerable<string> TableData { get; }
 
-    private static bool Validate(IElement elem)
-    {
-        return elem.TagName == "table";
-    }
+    // private static bool Validate(IElement elem)
+    // {
+    //     return elem.TagName == "table";
+    // }
 
-    public static TableNode? TryParse(IElement elem)
+    public static TableNode? TryParse(INode node)
     {
         // default implementation 
         return null;

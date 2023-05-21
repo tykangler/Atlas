@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Atlas.Core.Extensions;
 
-namespace Atlas.Core.Wiki.Annotator.Token;
+namespace Atlas.Core.Tokenizer.Token;
 
 public class LinkNode : WikiToken
 {
@@ -11,22 +11,29 @@ public class LinkNode : WikiToken
     public string Value { get; }
     public bool IsInterlink { get; }
 
-    private static bool Validate(IElement elem)
+    private static bool Validate(INode node)
     {
-        var isAnchor = elem.TagName == "A";
-        var hrefAttr = elem.GetAttribute(href);
-        var hasWikiHref = hrefAttr != null;
-        return isAnchor && hasWikiHref;
+        if (node is IElement element)
+        {
+            var isAnchor = element.TagName == "A";
+            var hrefAttr = element.GetAttribute(href);
+            var hasWikiHref = hrefAttr != null;
+            return isAnchor && hasWikiHref;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    public static LinkNode? TryParse(IElement elem)
+    public static LinkNode? TryParse(INode node)
     {
         // moved Validate here instead of outside, since here we can guarantee
         // that the node is valid.
-        if (Validate(elem))
+        if (node is IElement element && Validate(node))
         {
-            string link = elem.GetAttribute(href)!; // validated above
-            string value = elem.Text().NormalizeWhiteSpace();
+            string link = element.GetAttribute(href)!; // validated above
+            string value = element.Text().NormalizeWhiteSpace();
             if (!string.IsNullOrWhiteSpace(value))
             {
                 return new LinkNode(link, value, link.StartsWith("/wiki"));

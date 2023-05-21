@@ -1,4 +1,4 @@
-using Atlas.Core.Wiki.Models;
+using Atlas.Core.Clients.Wiki.Models;
 
 namespace Atlas.Core.Exceptions;
 

@@ -1,10 +1,10 @@
 namespace Atlas.Console.Services;
 
-using Atlas.Core.Wiki.Parse.Token;
+using Atlas.Core.Tokenizer.Token;
 
 public class WikiTokenVisitor : TokenVisitor
 {
-    private TextWriter writer;
+    private readonly TextWriter writer;
 
     public WikiTokenVisitor(TextWriter writer) => this.writer = writer;
 
