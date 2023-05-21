@@ -1,5 +1,4 @@
 using AngleSharp.Dom;
-using Atlas.Core.Tokenizer.Models;
 
 namespace Atlas.Core.Tokenizer.Token;
 
