@@ -8,13 +8,13 @@ public class WikiTokenVisitor : TokenVisitor
 
     public WikiTokenVisitor(TextWriter writer) => this.writer = writer;
 
-    public override void VisitLink(LinkNode node)
+    public override void VisitLink(LinkToken node)
     {
         string heading = node.IsInterlink ? "INTERLINK" : "LINK";
         writer.WriteLine($"[{heading}] - {node.Url} - {node.Value}");
     }
 
-    public override void VisitList(ListNode node)
+    public override void VisitList(ListToken node)
     {
         writer.WriteLine($"[LIST ({node.ListType})]");
         foreach (var item in node.ListItems)
@@ -23,7 +23,7 @@ public class WikiTokenVisitor : TokenVisitor
         }
     }
 
-    public override void VisitListItem(ListItem node)
+    public override void VisitListItem(ListToken node)
     {
         foreach (var item in node.Tokens)
         {
@@ -32,12 +32,12 @@ public class WikiTokenVisitor : TokenVisitor
         }
     }
 
-    public override void VisitSection(SectionNode node)
+    public override void VisitSection(SectionToken node)
     {
         writer.WriteLine($"[SECTION] - {node.Value}");
     }
 
-    public override void VisitText(TextNode node)
+    public override void VisitText(TextToken node)
     {
         writer.WriteLine($"[TEXT] - {node.Value}");
     }

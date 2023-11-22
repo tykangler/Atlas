@@ -2,7 +2,7 @@ using AngleSharp.Dom;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class TableNode : WikiToken
+public class TableToken : WikiToken
 {
     public IEnumerable<string> TableHeaders { get; }
     public IEnumerable<string> TableData { get; }
@@ -12,13 +12,13 @@ public class TableNode : WikiToken
     //     return elem.TagName == "table";
     // }
 
-    public static TableNode? TryParse(INode node)
+    public static TableToken? TryParse(INode node)
     {
         // default implementation 
         return null;
     }
 
-    public TableNode(IEnumerable<string> headers, IEnumerable<string> data)
+    public TableToken(IEnumerable<string> headers, IEnumerable<string> data)
     {
         TableHeaders = headers;
         TableData = data;

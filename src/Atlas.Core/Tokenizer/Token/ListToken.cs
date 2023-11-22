@@ -2,13 +2,13 @@ using AngleSharp.Dom;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class ListNode : WikiToken
+public class ListToken : WikiToken
 {
     private const string orderedListTag = "OL";
     private const string unorderedListTag = "UL";
     private const string listTag = "LI";
 
-    public IEnumerable<ListItem> ListItems { get; }
+    public IEnumerable<ListToken> ListItems { get; }
 
     public ListType ListType { get; }
 
@@ -18,24 +18,23 @@ public class ListNode : WikiToken
             (elem.TagName == orderedListTag || elem.TagName == unorderedListTag);
     }
 
-    public static async Task<ListNode?> TryParse(INode node)
+    public static ListToken? TryParse(INode node)
     {
         if (node is IElement element && Validate(node))
         {
-            var listItems = await Task.WhenAll(
-                element.Children
+            var listItems = element.Children
                     .Where(child => child.TagName == listTag)
-                    .Select(TokenFactory.Create));
+                    .Select(TokenFactory.Create);
 
             if (listItems?.Any() ?? false)
             {
-                return new ListNode(listItems.Cast<ListItem>(), element.TagName == "OL" ? ListType.OrderedList : ListType.UnorderedList);
+                return new ListToken(listItems.Cast<ListToken>(), element.TagName == "OL" ? ListType.OrderedList : ListType.UnorderedList);
             }
         }
         return null;
     }
 
-    public ListNode(IEnumerable<ListItem> listItems, ListType listType)
+    public ListToken(IEnumerable<ListToken> listItems, ListType listType)
     {
         ListItems = listItems;
         ListType = listType;

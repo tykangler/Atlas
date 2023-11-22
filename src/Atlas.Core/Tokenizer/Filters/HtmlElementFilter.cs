@@ -12,7 +12,7 @@ public static class HtmlElementFilter
     };
     private static readonly string[] disallowTags = { "style", "sup", "img", "table", "cite" };
 
-    public static IEnumerable<INode> FilterElements(IEnumerable<INode> nodes)
+    public static IEnumerable<INode> Filter(IEnumerable<INode> nodes)
     {
         return nodes.Where(IsElementValid);
     }

@@ -3,7 +3,7 @@ using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class SectionNode : WikiToken
+public class SectionToken : WikiToken
 {
     private const string sectionHeadingClass = "mw-headline";
 
@@ -14,16 +14,16 @@ public class SectionNode : WikiToken
         return node is IElement elem && elem.ClassList.Contains(sectionHeadingClass);
     }
 
-    public static SectionNode? TryParse(INode node)
+    public static SectionToken? TryParse(INode node)
     {
         if (Validate(node))
         {
-            return new SectionNode(node.Text().NormalizeWhiteSpace());
+            return new SectionToken(node.Text().NormalizeWhiteSpace());
         }
         return null;
     }
 
-    public SectionNode(string value) => Value = value;
+    public SectionToken(string value) => Value = value;
 
     public override void Accept(TokenVisitor visitor) => visitor.VisitSection(this);
 }

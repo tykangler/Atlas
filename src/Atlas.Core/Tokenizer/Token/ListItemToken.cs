@@ -2,7 +2,7 @@ using AngleSharp.Dom;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class ListItem : WikiToken
+public class ListItemToken : WikiToken
 {
     private const string listTag = "LI";
 
@@ -13,17 +13,17 @@ public class ListItem : WikiToken
         return node is IElement element && element.TagName == listTag;
     }
 
-    public static async Task<ListItem?> TryParse(INode node)
+    public static ListItemToken? TryParse(INode node)
     {
         if (node is IElement element && Validate(element))
         {
-            var tokens = await ElementTokenizer.Tokenize(element);
-            return new ListItem(tokens);
+            var tokens = ElementTokenizer.Tokenize(element);
+            return new ListItemToken(tokens);
         }
         return null;
     }
 
-    public ListItem(IEnumerable<WikiToken> tokens) => Tokens = tokens;
+    public ListItemToken(IEnumerable<WikiToken> tokens) => Tokens = tokens;
 
     public override void Accept(TokenVisitor visitor) => visitor.VisitListItem(this);
 }

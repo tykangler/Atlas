@@ -4,29 +4,29 @@ namespace Atlas.Core.Tokenizer.Token;
 
 public static class TokenFactory
 {
-    public static async Task<WikiToken?> Create(INode node)
+    public static WikiToken? Create(INode node)
     {
-        if (TextNode.TryParse(node) is TextNode textNode)
+        if (TextToken.TryParse(node) is TextToken textNode)
         {
             return textNode;
         }
-        else if (SectionNode.TryParse(node) is SectionNode sectionNode)
+        else if (SectionToken.TryParse(node) is SectionToken sectionNode)
         {
             return sectionNode;
         }
-        else if (LinkNode.TryParse(node) is LinkNode linkNode)
+        else if (LinkToken.TryParse(node) is LinkToken linkNode)
         {
             return linkNode;
         }
-        else if (await ListNode.TryParse(node) is ListNode listNode)
+        else if (ListToken.TryParse(node) is ListToken listNode)
         {
             return listNode;
         }
-        else if (await ListItem.TryParse(node) is ListItem listItem)
+        else if (ListToken.TryParse(node) is ListToken listItem)
         {
             return listItem;
         }
-        else if (TableNode.TryParse(node) is TableNode tableNode)
+        else if (TableToken.TryParse(node) is TableToken tableNode)
         {
             return tableNode;
         }

@@ -3,7 +3,7 @@ using Atlas.Core.Extensions;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class LinkNode : WikiToken
+public class LinkToken : WikiToken
 {
     private const string href = "href";
 
@@ -26,7 +26,7 @@ public class LinkNode : WikiToken
         }
     }
 
-    public static LinkNode? TryParse(INode node)
+    public static LinkToken? TryParse(INode node)
     {
         // moved Validate here instead of outside, since here we can guarantee
         // that the node is valid.
@@ -36,13 +36,13 @@ public class LinkNode : WikiToken
             string value = element.Text().NormalizeWhiteSpace();
             if (!string.IsNullOrWhiteSpace(value))
             {
-                return new LinkNode(link, value, link.StartsWith("/wiki"));
+                return new LinkToken(link, value, link.StartsWith("/wiki"));
             }
         }
         return null;
     }
 
-    public LinkNode(string url, string value, bool isInterlink)
+    public LinkToken(string url, string value, bool isInterlink)
     {
         Url = url;
         Value = value;

@@ -14,10 +14,10 @@ public abstract class TokenVisitor
     // tried dbpedia + wikidata. will maybe revisit in the future
     // but even then, there's some irrelevant and unclean information, random links to nowhere. 
     // public virtual void VisitTable(TableNode node) { }
-    public virtual void VisitLink(LinkNode node) { }
-    public virtual void VisitText(TextNode node) { }
-    public virtual void VisitSection(SectionNode node) { }
-    public virtual void VisitList(ListNode node) { }
+    public virtual void VisitLink(LinkToken node) { }
+    public virtual void VisitText(TextToken node) { }
+    public virtual void VisitSection(SectionToken node) { }
+    public virtual void VisitList(ListToken node) { }
 
-    public virtual void VisitListItem(ListItem node) { }
+    public virtual void VisitListItem(ListItemToken node) { }
 }

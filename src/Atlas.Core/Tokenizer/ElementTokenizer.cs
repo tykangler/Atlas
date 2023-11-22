@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using Atlas.Core.Tokenizer.Token;
 using Atlas.Core.Tokenizer.Filters;
-using System.Diagnostics.Contracts;
+using System.Collections.Immutable;
 
 namespace Atlas.Core.Tokenizer;
 
@@ -12,38 +12,50 @@ public static class ElementTokenizer
     /// </summary>
     /// <param name="rootElement"></param>
     /// <remarks>Although we are acting on the root, we actually just iterate through the children and tokenize those elements.</remarks>
-    public static async Task<List<WikiToken>> Tokenize(INode rootElement)
+    public static IEnumerable<WikiToken> Tokenize(INode rootElement)
     {
-        var wikiNodes = new List<WikiToken>();
-        var filteredNodes = HtmlElementFilter.FilterElements(rootElement.ChildNodes);
-        foreach (var childHtmlNode in filteredNodes)
-        {
-            var token = await TokenFactory.Create(childHtmlNode);
-            var toAdd = token == null ? await Tokenize(childHtmlNode) : new List<WikiToken> { token };
-            MergeWikiNodes(wikiNodes, toAdd);
-        }
-
-        return wikiNodes;
+        return HtmlElementFilter
+            .Filter(rootElement.ChildNodes)
+            .Select(CreateWikiTokens)
+            .Aggregate(Enumerable.Empty<WikiToken>(), MergeWikiTokens);
     }
 
     /// <summary>
-    /// Merges wiki nodes. And handles merging text nodes if present. 
+    /// Given an html node, creates a list of wiki tokens. The list will have more than one element if the node is a container node,
+    /// and will have only one element if it can be mapped directly to a wiki token.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
+    private static IEnumerable<WikiToken> CreateWikiTokens(INode node)
+    {
+        var token = TokenFactory.Create(node);
+        return token == null ? Tokenize(node) : ImmutableList.Create(token);
+    }
+
+    /// <summary>
+    /// Merges wiki nodes into a single node list.
     /// </summary>
     /// <returns></returns>
-    /// <remarks>Handles merging wiki nodes</remarks>
-    private static void MergeWikiNodes(List<WikiToken> initialTokens, List<WikiToken> toAdd)
+    /// <remarks> 
+    ///     If the last token in <see cref="tokens"/> and the first token in <see cref="toAdd"/> are text nodes, the two nodes will be merged.
+    ///     For example, if tokens[^1] is TextNode and toAdd[0] is TextNode, then the end result's last node will be a merged TextNode
+    ///     consisting of tokens[^1] + toAdd[0], and toAdd[0] will be ignored.
+    /// </remarks>
+    private static IEnumerable<WikiToken> MergeWikiTokens(IEnumerable<WikiToken> tokens, IEnumerable<WikiToken> toAdd)
     {
-        if (toAdd.Count > 0 && toAdd[0] is TextNode textNode &&
-            initialTokens.Count > 0 && initialTokens[^1] is TextNode lastTextNode)
+        if (toAdd.Any() && toAdd.First() is TextToken textNode &&
+            tokens.Any() && tokens.Last() is TextToken lastTextNode)
         {
-            initialTokens[^1] = MergeTextNodes(lastTextNode, textNode);
-            initialTokens.AddRange(toAdd.Skip(1));
+            return tokens
+                .SkipLast(1)
+                .Append(MergeTextNodes(lastTextNode, textNode))
+                .Concat(toAdd.Skip(1));
         }
         else
         {
-            initialTokens.AddRange(toAdd);
+            return tokens.Concat(toAdd);
         }
     }
 
-    private static TextNode MergeTextNodes(TextNode node1, TextNode node2) => new($"{node1.Value} {node2.Value}");
+    private static WikiToken MergeTextNodes(TextToken node1, TextToken node2) => new TextToken($"{node1.Value} {node2.Value}");
 }
