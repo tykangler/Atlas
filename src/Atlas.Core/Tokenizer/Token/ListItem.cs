@@ -17,7 +17,7 @@ public class ListItem : WikiToken
     {
         if (node is IElement element && Validate(element))
         {
-            var tokens = await ElementTokenizer.TokenizeElement(element);
+            var tokens = await ElementTokenizer.Tokenize(element);
             return new ListItem(tokens);
         }
         return null;

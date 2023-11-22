@@ -10,6 +10,8 @@ public class ListNode : WikiToken
 
     public IEnumerable<ListItem> ListItems { get; }
 
+    public ListType ListType { get; }
+
     private static bool Validate(INode node)
     {
         return node is IElement elem &&
@@ -27,13 +29,17 @@ public class ListNode : WikiToken
 
             if (listItems?.Any() ?? false)
             {
-                return new ListNode(listItems.Cast<ListItem>());
+                return new ListNode(listItems.Cast<ListItem>(), element.TagName == "OL" ? ListType.OrderedList : ListType.UnorderedList);
             }
         }
         return null;
     }
 
-    public ListNode(IEnumerable<ListItem> listItems) => ListItems = listItems;
+    public ListNode(IEnumerable<ListItem> listItems, ListType listType)
+    {
+        ListItems = listItems;
+        ListType = listType;
+    }
 
     public override void Accept(TokenVisitor visitor) => visitor.VisitList(this);
 }

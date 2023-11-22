@@ -5,7 +5,6 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Atlas.Core.Tokenizer.Input;
 using Atlas.Core.Tokenizer.Token;
-using Atlas.Core.Tokenizer.Validators;
 using Document = Input.Document;
 
 /// <summary>
@@ -56,11 +55,11 @@ public class HtmlTokenizer : ITokenizer
             {
                 throw new ArgumentException("The string html document must contain an element with class '.mw-parser-output'", nameof(document));
             }
-            return await ElementTokenizer.TokenizeElement(starterNode);
+            return await ElementTokenizer.Tokenize(starterNode);
         }
         else
         {
-            return await ElementTokenizer.TokenizeElement(htmlDocument.Node);
+            return await ElementTokenizer.Tokenize(htmlDocument.Node);
         }
     }
 

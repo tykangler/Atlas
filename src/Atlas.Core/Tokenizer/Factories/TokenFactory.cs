@@ -1,5 +1,4 @@
 using AngleSharp.Dom;
-using Atlas.Core.Tokenizer.Validators;
 
 namespace Atlas.Core.Tokenizer.Token;
 
@@ -7,12 +6,7 @@ public static class TokenFactory
 {
     public static async Task<WikiToken?> Create(INode node)
     {
-        bool elementValid = HtmlElementValidator.IsElementValid(node);
-        if (!elementValid)
-        {
-            return null;
-        }
-        else if (TextNode.TryParse(node) is TextNode textNode)
+        if (TextNode.TryParse(node) is TextNode textNode)
         {
             return textNode;
         }
