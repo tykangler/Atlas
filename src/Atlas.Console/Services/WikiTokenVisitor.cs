@@ -23,7 +23,7 @@ public class WikiTokenVisitor : TokenVisitor
         }
     }
 
-    public override void VisitListItem(ListToken node)
+    public override void VisitListItem(ListItemToken node)
     {
         foreach (var item in node.Tokens)
         {
