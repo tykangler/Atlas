@@ -8,6 +8,7 @@ using Atlas.Core.Services;
 using Atlas.Core.Tokenizer.Token;
 using Atlas.Core.Clients.Wiki.Models;
 using Atlas.Core.Tokenizer.Input;
+using System.Diagnostics;
 
 [Verb("parse", HelpText = "parse wikipedia html documents into token list")]
 public class ExtractOptions
@@ -26,23 +27,39 @@ public class ExtractOptions
 
     public async Task Callback()
     {
+        using var textWriter = OutputFile == null ? Console.Out : CreateFile(OutputFile);
         var tokenizer = new HtmlTokenizer();
         IEnumerable<WikiToken>? tokens;
         if (PageTitle != null)
         {
-            WikiParseResponse response = await GetWikiDocumentFromTitle(PageTitle);
-            tokens = await tokenizer.Tokenize(new HtmlDocument
-            (
-                Content: response.Parse.Text
-            ));
+            WikiParseResponse response;
+            using (var timer = new Timer(textWriter, "Get Documents With Title"))
+            {
+                response = await GetWikiDocumentFromTitle(PageTitle);
+            }
+            using (var timer = new Timer(textWriter, "Tokenize Documents"))
+            {
+                tokens = await tokenizer.Tokenize(new HtmlDocument
+                (
+                    Content: response.Parse.Text
+                ));
+            }
+
         }
         else if (PageId >= 0)
         {
-            WikiParseResponse response = await GetWikiDocumentFromId(PageId);
-            tokens = await tokenizer.Tokenize(new HtmlDocument
-            (
-                Content: response.Parse.Text
-            ));
+            WikiParseResponse response;
+            using (var timer = new Timer(textWriter, "Get Documents With Id"))
+            {
+                response = await GetWikiDocumentFromId(PageId);
+            }
+            using (var timer = new Timer(textWriter, "Tokenize Documents"))
+            {
+                tokens = await tokenizer.Tokenize(new HtmlDocument
+                (
+                    Content: response.Parse.Text
+                ));
+            }
         }
         else if (Html != null)
         {
@@ -56,8 +73,8 @@ public class ExtractOptions
             Console.WriteLine("either html, title, or page-id must be specified");
             return;
         }
-        using var textWriter = OutputFile == null ? Console.Out : CreateFile(OutputFile);
         TokenVisitor visitor = new WikiTokenVisitor(textWriter);
+        textWriter.WriteLine("\nRESULT - ");
         foreach (var token in tokens)
         {
             token.Accept(visitor);

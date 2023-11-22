@@ -11,26 +11,35 @@ public class WikiTokenVisitor : TokenVisitor
     public override void VisitLink(LinkNode node)
     {
         string heading = node.IsInterlink ? "INTERLINK" : "LINK";
-        this.writer.WriteLine($"[{heading}] - {node.Url} - {node.Value}");
+        writer.WriteLine($"[{heading}] - {node.Url} - {node.Value}");
     }
 
     public override void VisitList(ListNode node)
     {
-        this.writer.WriteLine("[LIST]");
+        writer.WriteLine($"[LIST ({node.ListType})]");
         foreach (var item in node.ListItems)
         {
             item.Accept(this);
         }
     }
 
+    public override void VisitListItem(ListItem node)
+    {
+        foreach (var item in node.Tokens)
+        {
+            writer.WriteLine($"[LIST ITEM]");
+            item.Accept(this);
+        }
+    }
+
     public override void VisitSection(SectionNode node)
     {
-        this.writer.WriteLine($"[SECTION] - {node.Value}");
+        writer.WriteLine($"[SECTION] - {node.Value}");
     }
 
     public override void VisitText(TextNode node)
     {
-        this.writer.WriteLine($"[TEXT] - {node.Value}");
+        writer.WriteLine($"[TEXT] - {node.Value}");
     }
 
 }
