@@ -12,3 +12,4 @@ class SpacyCorefereeService:
     def process(self, document):
         prediction = self.pipeline(document)
         logging.info(prediction._.coref_chains)
+        return prediction._.coref_chains

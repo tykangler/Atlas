@@ -6,33 +6,30 @@ public static class TokenFactory
 {
     public static WikiToken? Create(INode node)
     {
-        if (TextToken.TryParse(node) is TextToken textNode)
+        if (TextToken.TryParse(node) is TextToken textToken)
         {
-            return textNode;
+            return textToken;
         }
-        else if (SectionToken.TryParse(node) is SectionToken sectionNode)
+        else if (SectionToken.TryParse(node) is SectionToken sectionToken)
         {
-            return sectionNode;
+            return sectionToken;
         }
-        else if (LinkToken.TryParse(node) is LinkToken linkNode)
+        else if (LinkToken.TryParse(node) is LinkToken linkToken)
         {
-            return linkNode;
+            return linkToken;
         }
-        else if (ListToken.TryParse(node) is ListToken listNode)
+        else if (ListToken.TryParse(node) is ListToken listToken)
         {
-            return listNode;
+            return listToken;
         }
-        else if (ListToken.TryParse(node) is ListToken listItem)
+        else if (ListItemToken.TryParse(node) is ListItemToken listItemToken)
         {
-            return listItem;
+            return listItemToken;
         }
-        else if (TableToken.TryParse(node) is TableToken tableNode)
+        else if (TableToken.TryParse(node) is TableToken tableToken)
         {
-            return tableNode;
+            return tableToken;
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 }

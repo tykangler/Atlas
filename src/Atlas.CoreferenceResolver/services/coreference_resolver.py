@@ -13,4 +13,7 @@ class CoreferenceResolver(CoreferenceResolverServicer):
     
     @log_request
     def ResolveAntecedents(self, request, context):
-        self.spacy_coreferee_service.process(' '.join(request.tokens))
+        yield models.CorefCluster(
+            mentions=self.spacy_coreferee_service.process(' '.join(request.tokens)),
+            antecedent=None
+        )

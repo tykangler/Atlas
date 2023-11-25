@@ -13,12 +13,10 @@ public static class ElementTokenizer
     /// <param name="rootElement"></param>
     /// <remarks>Although we are acting on the root, we actually just iterate through the children and tokenize those elements.</remarks>
     public static IEnumerable<WikiToken> Tokenize(INode rootElement)
-    {
-        return HtmlElementFilter
+        => HtmlElementFilter
             .Filter(rootElement.ChildNodes)
             .Select(CreateWikiTokens)
             .Aggregate(Enumerable.Empty<WikiToken>(), MergeWikiTokens);
-    }
 
     /// <summary>
     /// Given an html node, creates a list of wiki tokens. The list will have more than one element if the node is a container node,

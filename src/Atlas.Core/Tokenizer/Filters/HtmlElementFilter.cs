@@ -5,7 +5,7 @@ namespace Atlas.Core.Tokenizer.Filters;
 
 public static class HtmlElementFilter
 {
-    // these will be evlauated as partial matches.
+    // these will be evaluated as partial matches.
     // for example, reference-a is a match.
     private static readonly string[] disallowClasses = {
         "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"

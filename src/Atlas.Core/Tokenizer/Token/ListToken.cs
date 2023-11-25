@@ -8,7 +8,7 @@ public class ListToken : WikiToken
     private const string unorderedListTag = "UL";
     private const string listTag = "LI";
 
-    public IEnumerable<ListToken> ListItems { get; }
+    public IEnumerable<ListItemToken> ListItems { get; }
 
     public ListType ListType { get; }
 
@@ -22,19 +22,22 @@ public class ListToken : WikiToken
     {
         if (node is IElement element && Validate(node))
         {
+            var listType = element.TagName.Equals(orderedListTag, StringComparison.OrdinalIgnoreCase) ? ListType.OrderedList : ListType.UnorderedList;
             var listItems = element.Children
                     .Where(child => child.TagName == listTag)
                     .Select(TokenFactory.Create);
 
             if (listItems?.Any() ?? false)
             {
-                return new ListToken(listItems.Cast<ListToken>(), element.TagName == "OL" ? ListType.OrderedList : ListType.UnorderedList);
+                return new ListToken(
+                    listItems: listItems.Cast<ListItemToken>(),
+                    listType: listType);
             }
         }
         return null;
     }
 
-    public ListToken(IEnumerable<ListToken> listItems, ListType listType)
+    public ListToken(IEnumerable<ListItemToken> listItems, ListType listType)
     {
         ListItems = listItems;
         ListType = listType;
