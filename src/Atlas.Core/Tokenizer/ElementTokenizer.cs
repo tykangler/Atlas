@@ -8,13 +8,20 @@ namespace Atlas.Core.Tokenizer;
 public static class ElementTokenizer
 {
     /// <summary>
-    /// Tokenizes an html node into a list of <see cref="WikiToken"/> objects. 
+    /// Tokenizes children of the root node into a list of <see cref="WikiToken"/> objects. Elements are filtered based on <see cref="HtmlElementFilter"/>. 
+    /// The passed <see cref="rootNode"/> is excluded, so that the final result is a list of tokens corresponding to the children of the root node.
     /// </summary>
     /// <param name="rootElement"></param>
-    /// <remarks>Although we are acting on the root, we actually just iterate through the children and tokenize those elements.</remarks>
-    public static IEnumerable<WikiToken> Tokenize(INode rootElement)
-        => HtmlElementFilter
-            .Filter(rootElement.ChildNodes)
+    public static IEnumerable<WikiToken> TokenizeChildren(INode rootNode) => TokenizeNodes(rootNode.ChildNodes);
+
+    /// <summary>
+    /// Tokenizes a list of nodes into wiki tokens. Note that the final result may not be a 1:1 mapping because <see cref="HtmlElementFilter"/> will filter
+    /// out noisy nodes.
+    /// </summary>
+    /// <param name="nodes">Nodes to tokenize</param>
+    /// <returns></returns>
+    public static IEnumerable<WikiToken> TokenizeNodes(IEnumerable<INode> nodes)
+        => HtmlElementFilter.Filter(nodes)
             .Select(CreateWikiTokens)
             .Aggregate(Enumerable.Empty<WikiToken>(), MergeWikiTokens);
 
@@ -27,7 +34,9 @@ public static class ElementTokenizer
     private static IEnumerable<WikiToken> CreateWikiTokens(INode node)
     {
         var token = TokenFactory.Create(node);
-        return token == null ? Tokenize(node) : ImmutableList.Create(token);
+        return token == null // if token is container, it can't be invalid since we already filtered elements
+            ? TokenizeChildren(node)
+            : ImmutableList.Create(token);
     }
 
     /// <summary>

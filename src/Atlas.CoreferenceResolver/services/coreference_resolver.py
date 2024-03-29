@@ -7,6 +7,8 @@ from services.spacy_coreferee_service import SpacyCorefereeService
 # pass into service then?
 # in here, run pipeline(request)
 
+# this was a nice experiment. But I don't think we need AI, let's just a simple scoring system.
+
 class CoreferenceResolver(CoreferenceResolverServicer):
     def __init__(self):
         self.spacy_coreferee_service = SpacyCorefereeService()

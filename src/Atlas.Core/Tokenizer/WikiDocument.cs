@@ -3,7 +3,7 @@ using Atlas.Core.Tokenizer.Token;
 
 namespace Atlas.Core.Tokenizer;
 
-public interface ITokenizer
-{
-    public Task<WikiDocument> Tokenize(Document document);
-}
+public record WikiDocument(
+    Document RawInput,
+    IEnumerable<WikiToken> WikiTokens
+);

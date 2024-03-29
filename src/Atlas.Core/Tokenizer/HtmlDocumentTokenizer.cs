@@ -12,12 +12,12 @@ using Document = Input.Document;
 /// with respect to their order in the wikipedia document.
 /// WikiTokenType 
 /// </summary>
-public class HtmlTokenizer : ITokenizer
+public class HtmlDocumentTokenizer : ITokenizer
 {
     private const string StarterNodeClass = ".mw-parser-output";
     private readonly HtmlParser htmlParser;
 
-    public HtmlTokenizer()
+    public HtmlDocumentTokenizer()
     {
         htmlParser = new HtmlParser(new HtmlParserOptions
         {
@@ -25,7 +25,7 @@ public class HtmlTokenizer : ITokenizer
         });
     }
 
-    public async Task<IEnumerable<WikiToken>> Tokenize(Document document)
+    public async Task<WikiDocument> Tokenize(Document document)
     {
         if (document is not HtmlDocument htmlDocument)
         {
@@ -39,11 +39,19 @@ public class HtmlTokenizer : ITokenizer
             {
                 throw new ArgumentException("The string html document must contain an element with class '.mw-parser-output'", nameof(document));
             }
-            return ElementTokenizer.Tokenize(starterNode);
+            return new WikiDocument
+            (
+                RawInput: document,
+                WikiTokens: ElementTokenizer.TokenizeChildren(starterNode)
+            );
         }
         else
         {
-            return ElementTokenizer.Tokenize(htmlDocument.Node);
+            return new WikiDocument
+            (
+                RawInput: document,
+                WikiTokens: ElementTokenizer.TokenizeChildren(htmlDocument.Node)
+            );
         }
     }
 

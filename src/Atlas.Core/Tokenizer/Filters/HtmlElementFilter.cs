@@ -10,17 +10,16 @@ public static class HtmlElementFilter
     private static readonly string[] disallowClasses = {
         "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
     };
-    private static readonly string[] disallowTags = { "style", "sup", "img", "table", "cite" };
+    private static readonly string[] disallowTags = { "style", "sup", "img", "cite", "script", "table" };
 
     public static IEnumerable<INode> Filter(IEnumerable<INode> nodes)
     {
         return nodes.Where(IsElementValid);
     }
 
-    private static bool IsElementValid(INode node)
+    public static bool IsElementValid(INode node)
     {
-        var isText = node.NodeType == NodeType.Text;
-        if (isText)
+        if (node.NodeType == NodeType.Text)
         {
             return true;
         }

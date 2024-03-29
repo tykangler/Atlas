@@ -1,34 +1,37 @@
 using AngleSharp.Dom;
+using Atlas.Core.Tokenizer.Handlers;
 
 namespace Atlas.Core.Tokenizer.Token;
 
 public static class TokenFactory
 {
+    private static IEnumerable<IHandler> handlers = new List<IHandler>
+    {
+        new LinkHandler(),
+        new InfoboxHandler(),
+        new ListHandler(),
+        new ListItemHandler(),
+        new SectionHandler(),
+        new TableHandler(),
+        new TableHeaderHandler(),
+        new TableRowHandler(),
+        new TextHandler(),
+    };
+
+    /// <summary>
+    /// Create a wiki token based on the type of the given node. If no handler can be found for the node,
+    /// returns null. This includes elements that should be filtered and container nodes.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public static WikiToken? Create(INode node)
     {
-        if (TextToken.TryParse(node) is TextToken textToken)
+        foreach (var handler in handlers)
         {
-            return textToken;
-        }
-        else if (SectionToken.TryParse(node) is SectionToken sectionToken)
-        {
-            return sectionToken;
-        }
-        else if (LinkToken.TryParse(node) is LinkToken linkToken)
-        {
-            return linkToken;
-        }
-        else if (ListToken.TryParse(node) is ListToken listToken)
-        {
-            return listToken;
-        }
-        else if (ListItemToken.TryParse(node) is ListItemToken listItemToken)
-        {
-            return listItemToken;
-        }
-        else if (TableToken.TryParse(node) is TableToken tableToken)
-        {
-            return tableToken;
+            if (handler.CanHandle(node))
+            {
+                return handler.Handle(node);
+            }
         }
         return null;
     }

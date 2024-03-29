@@ -8,7 +8,6 @@ using Atlas.Core.Services;
 using Atlas.Core.Tokenizer.Token;
 using Atlas.Core.Clients.Wiki.Models;
 using Atlas.Core.Tokenizer.Input;
-using System.Diagnostics;
 
 [Verb("parse", HelpText = "parse wikipedia html documents into token list")]
 public class ExtractOptions
@@ -28,8 +27,8 @@ public class ExtractOptions
     public async Task Callback()
     {
         using var textWriter = OutputFile == null ? Console.Out : CreateFile(OutputFile);
-        var tokenizer = new HtmlTokenizer();
-        IEnumerable<WikiToken>? tokens;
+        var tokenizer = new HtmlDocumentTokenizer();
+        WikiDocument? tokens;
         if (PageTitle != null)
         {
             WikiParseResponse response;
@@ -75,7 +74,7 @@ public class ExtractOptions
         }
         TokenVisitor visitor = new WikiTokenVisitor(textWriter);
         textWriter.WriteLine("\nRESULT - ");
-        foreach (var token in tokens)
+        foreach (var token in tokens.WikiTokens)
         {
             token.Accept(visitor);
         }

@@ -4,24 +4,14 @@ namespace Atlas.Core.Tokenizer.Token;
 
 public class TableToken : WikiToken
 {
-    public IEnumerable<string> TableHeaders { get; }
-    public IEnumerable<string> TableData { get; }
+    public IEnumerable<WikiToken> TableHeaders { get; private set; }
 
-    // private static bool Validate(IElement elem)
-    // {
-    //     return elem.TagName == "table";
-    // }
+    public IEnumerable<TableRowToken> TableRows { get; private set; }
 
-    public static TableToken? TryParse(INode node)
-    {
-        // default implementation 
-        return null;
-    }
-
-    public TableToken(IEnumerable<string> headers, IEnumerable<string> data)
+    public TableToken(IEnumerable<WikiToken> headers, IEnumerable<TableRowToken> data)
     {
         TableHeaders = headers;
-        TableData = data;
+        TableRows = data;
     }
 
     public override void Accept(TokenVisitor visitor) => throw new NotImplementedException();
