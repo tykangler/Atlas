@@ -8,9 +8,10 @@ public static class HtmlElementFilter
     // these will be evaluated as partial matches.
     // for example, reference-a is a match.
     private static readonly string[] disallowClasses = {
-        "infobox", "reflist", "reference", "hatnote", "thumb", "noprint"
+        "infobox", "reflist", "reference", "hatnote", "thumb", "noprint", "sidebar", "citations",
+        "navbox"
     };
-    private static readonly string[] disallowTags = { "style", "sup", "img", "cite", "script", "table" };
+    private static readonly string[] disallowTags = { "style", "sup", "img", "cite", "script" };
 
     public static IEnumerable<INode> Filter(IEnumerable<INode> nodes)
     {

@@ -1,18 +1,9 @@
 using AngleSharp.Dom;
+using Atlas.Core.Tokenizer.Token.Table;
 
 namespace Atlas.Core.Tokenizer.Token;
 
-public class TableToken : WikiToken
+public record TableToken(TableHeaderRow Headers, IEnumerable<TableDataRow> Data) : WikiToken
 {
-    public IEnumerable<WikiToken> TableHeaders { get; private set; }
-
-    public IEnumerable<TableRowToken> TableRows { get; private set; }
-
-    public TableToken(IEnumerable<WikiToken> headers, IEnumerable<TableRowToken> data)
-    {
-        TableHeaders = headers;
-        TableRows = data;
-    }
-
-    public override void Accept(TokenVisitor visitor) => throw new NotImplementedException();
+    public override void Accept(TokenVisitor visitor) => visitor.VisitTable(this);
 }

@@ -19,6 +19,10 @@ public class TextHandler : IHandler
         }
         string cleanedTextToken = ReplaceNewlineLiterals(node.TextContent)
             .NormalizeWhiteSpace();
+        if (string.IsNullOrWhiteSpace(cleanedTextToken))
+        {
+            return null;
+        }
         return new TextToken(cleanedTextToken);
     }
 

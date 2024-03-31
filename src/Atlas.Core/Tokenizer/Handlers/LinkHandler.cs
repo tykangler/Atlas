@@ -7,12 +7,13 @@ namespace Atlas.Core.Tokenizer.Handlers;
 public class LinkHandler : IHandler
 {
     private const string HrefAttribute = "href";
+    private const string LinkTag = "A";
 
     public bool CanHandle(INode node)
     {
         if (node is IElement element)
         {
-            var isAnchor = element.TagName == "A";
+            var isAnchor = element.IsTag(LinkTag);
             var hrefAttr = element.GetAttribute(HrefAttribute);
             var hasWikiHref = hrefAttr != null;
             return isAnchor && hasWikiHref;
@@ -31,7 +32,12 @@ public class LinkHandler : IHandler
         }
 
         string link = element.GetAttribute(HrefAttribute)!;
-        string value = element.Text().NormalizeWhiteSpace();
+        string? value = element.Text()?.NormalizeWhiteSpace();
+        // if the link is to a file or the link does not contain any text, we don't want to tokenize it.
+        if (link.Contains("File:") || string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
         return new LinkToken(link, value, link.StartsWith("/wiki"));
     }
 

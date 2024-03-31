@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using Atlas.Core.Extensions;
 using Atlas.Core.Tokenizer.Token;
 
 namespace Atlas.Core.Tokenizer.Handlers;
@@ -9,7 +10,7 @@ public class ListItemHandler : IHandler
 
     public bool CanHandle(INode node)
     {
-        return node is IElement element && element.TagName == ListItemTag;
+        return node is IElement element && element.IsTag(ListItemTag);
     }
 
     public WikiToken? Handle(INode node)

@@ -13,8 +13,6 @@ public static class TokenFactory
         new ListItemHandler(),
         new SectionHandler(),
         new TableHandler(),
-        new TableHeaderHandler(),
-        new TableRowHandler(),
         new TextHandler(),
     };
 

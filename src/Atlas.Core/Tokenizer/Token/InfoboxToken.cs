@@ -1,11 +1,6 @@
 namespace Atlas.Core.Tokenizer.Token;
 
-public class InfoboxToken : WikiToken
+public record InfoboxToken : WikiToken
 {
-
-
-    public override void Accept(TokenVisitor visitor)
-    {
-        throw new NotImplementedException();
-    }
+    public override void Accept(TokenVisitor visitor) => visitor.VisitInfobox(this);
 }

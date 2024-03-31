@@ -1,6 +1,6 @@
 namespace Atlas.Core.Tokenizer.Token;
 
-public abstract class WikiToken
+public abstract record WikiToken
 {
     public abstract void Accept(TokenVisitor visitor);
 }

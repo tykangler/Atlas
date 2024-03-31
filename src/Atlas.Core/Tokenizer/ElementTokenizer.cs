@@ -33,8 +33,9 @@ public static class ElementTokenizer
     /// <returns></returns>
     private static IEnumerable<WikiToken> CreateWikiTokens(INode node)
     {
+        // if token is container or can't be created, we can just ignore and recurse down.  
         var token = TokenFactory.Create(node);
-        return token == null // if token is container, it can't be invalid since we already filtered elements
+        return token == null
             ? TokenizeChildren(node)
             : ImmutableList.Create(token);
     }
