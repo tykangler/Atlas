@@ -28,7 +28,7 @@ public class ExtractOptions
     {
         using var textWriter = OutputFile == null ? Console.Out : CreateFile(OutputFile);
         var tokenizer = new HtmlDocumentTokenizer();
-        WikiDocument? tokens;
+        TokenizedDocument? tokens;
         if (PageTitle != null)
         {
             WikiParseResponse response;
