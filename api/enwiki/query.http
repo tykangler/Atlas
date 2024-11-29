@@ -1,0 +1,11 @@
+@baseAction=https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&errorformat=plaintext
+
+###
+
+@titles=Barack_Obama|Queen_Angelfish
+GET {{baseAction}}
+    &prop=categories|extracts|links
+    &titles={{titles}}
+    &redirects=true
+    &explaintext=true
+    &pllimit=500

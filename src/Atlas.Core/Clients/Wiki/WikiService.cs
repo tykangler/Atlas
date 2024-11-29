@@ -62,14 +62,13 @@ public class WikiApiService
         return await GetWikiResponse<WikiGetPageResponse>(queryParams, cancellationToken);
     }
 
-    public async Task<WikiParseResponse> ParsePageFromIdAsync(string pageId, CancellationToken cancellationToken = default)
+    public async Task<WikiParseResponse> GetPageContentFromIdAsync(string pageId, CancellationToken cancellationToken = default)
     {
         var queryParams = defaultQueryParams.Concat(new (string, string)[] {
                 ("action", "parse"),
                 ("prop", "text|categories"),
                 ("pageid", pageId),
                 ("redirects", "true"),
-                // disabled sections
                 ("disableeditsection", "true"),
                 ("disabletoc", "true"),
                 ("disablelimitreport", "true"),
@@ -77,7 +76,7 @@ public class WikiApiService
         return await GetWikiResponse<WikiParseResponse>(queryParams, cancellationToken);
     }
 
-    public async Task<WikiParseResponse> ParsePageFromTitleAsync(string pageTitle, CancellationToken cancellationToken = default)
+    public async Task<WikiParseResponse> GetPageContentFromTitleAsync(string pageTitle, CancellationToken cancellationToken = default)
     {
         var queryParams = defaultQueryParams.Concat(new (string, string)[] {
                 ("action", "parse"),

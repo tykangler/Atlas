@@ -1,0 +1,9 @@
+@baseAction=https://en.wikipedia.org/w/api.php?action=expandtemplates&format=json&formatversion=2&errorformat=plaintext
+
+###
+
+@pageTitle=Barack_Obama
+GET {{baseAction}}
+    &title={{pageTitle}}
+    &text=\{\{marriage|[[Michelle Obama|Michelle Robinson]]|October 3, 1992\}\}
+    &prop=wikitext|categories

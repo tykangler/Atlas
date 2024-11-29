@@ -1,97 +1,47 @@
 namespace Atlas.Console.Commands.WikiApi;
 
 using System;
-using System.Text.Json;
 using Atlas.Console.Services;
 using Atlas.Core.Services;
 using CommandLine;
-using Atlas.Core.Clients.Wiki.Models;
+using Atlas.Console.Exceptions;
 
-[Verb("wiki-page-content", HelpText = "Parse a page given a page id")]
+[Verb("wiki-page-content", HelpText = "Parse a page given a page id, or title")]
 public class PageContentOptions
 {
-    [Option('p', "page-id", HelpText = "page id (mutually exclusive with page title)", SetName = "page-id", Default = -1)]
-    public int PageId { get; set; }
+    [Option('p', "page-id", HelpText = "page id (mutually exclusive with page title)", SetName = "page-id", Default = null)]
+    public string? PageId { get; set; }
 
-    [Option('t', "title", HelpText = "page title (mutually exclusive with page id)", SetName = "title")]
+    [Option('t', "title", HelpText = "page title (mutually exclusive with page id)", SetName = "title", Default = null)]
     public string? Title { get; set; }
 
     [Option('h', "hidden", HelpText = "display hidden categories", Default = false)]
     public bool DisplayHidden { get; set; }
 
-    [Option('o', "output", HelpText = "output file")]
+    [Option('o', "out", HelpText = "output file")]
     public string? OutputFile { get; set; }
 
     public async Task Callback()
     {
         var apiService = new WikiApiService(new HttpClient());
-        WikiParseResponse response;
-        if (PageId >= 0)
+        var pageContentService = new PageContentService(apiService);
+        try
         {
-            response = await apiService.ParsePageFromIdAsync(PageId.ToString());
-            await WriteResponse(response);
-        }
-        else if (Title != null)
-        {
-            response = await apiService.ParsePageFromTitleAsync(Title);
-            await WriteResponse(response);
-        }
-        else
-        {
-            Console.WriteLine("At least page-id or title must be specified");
-        }
-
-    }
-
-    private async Task WriteResponse(WikiParseResponse response)
-    {
-        if (OutputFile == null)
-        {
-            WriteToConsole(response);
-        }
-        else
-        {
-            await WriteToFile(response, OutputFile);
-        }
-    }
-
-    private static async Task WriteToFile(WikiParseResponse response, string fileName)
-    {
-        using var outStream = FileUtilities.CreateFile(fileName);
-        await outStream.WriteAsync(JsonSerializer.Serialize(response,
-            new JsonSerializerOptions
+            Console.WriteLine("Sending request to retrieve page");
+            var response = await pageContentService.GetPageContent(Title, PageId);
+            Console.WriteLine("Retrieved page");
+            if (response != null)
             {
-                WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            }));
-    }
-
-    private void WriteToConsole(WikiParseResponse response)
-    {
-        Console.WriteLine($"Found page {response.Parse.Title}");
-        if (response.Parse.Redirects.Any())
-        {
-            Console.WriteLine($"Page with id {PageId} is a redirect page");
-            foreach (var redirect in response.Parse.Redirects)
+                await OutputService.WriteObjectToConsoleOrFile(response, OutputFile);
+            }
+            else
             {
-                Console.WriteLine($"\tFrom: {redirect.From}, To: {redirect.To}");
+                Console.WriteLine("No response returned from API");
             }
         }
-        Console.WriteLine("============================");
-        Console.WriteLine($"Title: {response.Parse.Title}");
-        Console.WriteLine("Categories: ");
-        foreach (var category in response.Parse.Categories)
+        catch (InvalidOptionsException ex)
         {
-            if (category.Hidden && DisplayHidden)
-            {
-                Console.WriteLine("\t" + category.Category);
-            }
-            else if (!category.Hidden)
-            {
-                Console.WriteLine("\t" + category.Category);
-            }
+            Console.WriteLine(ex.Message);
         }
-        Console.WriteLine("Text: ");
-        Console.WriteLine(response.Parse.Text);
     }
 }

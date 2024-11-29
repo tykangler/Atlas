@@ -1,0 +1,13 @@
+@baseAction=https://en.wikipedia.org/w/api.php?action=parse&format=json&formatversion=2&errorformat=plaintext
+
+###
+
+@pageTitle=Pet_door
+GET {{baseAction}}
+    &page={{pageTitle}}
+    &prop=text|categories|sections|iwlinks|links
+    &redirects=true
+    &disableeditsection=true
+    &disabletoc=true
+    &disablelimitreport=true
+    &wrapoutputclass=test-output

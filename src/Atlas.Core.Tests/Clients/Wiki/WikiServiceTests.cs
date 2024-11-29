@@ -1,11 +1,10 @@
 using System.Diagnostics;
-using Atlas.Core.Exceptions;
 using Atlas.Core.Services;
 using Atlas.Core.Clients.Wiki.Models;
 
-namespace Atlas.Core.Tests.Wiki.Data;
+namespace Atlas.Core.Tests.Clients.Wiki;
 
-public class WikiApiServiceTests
+public class WikiServiceTests
 {
     [Trait("Category", "ApiService")]
     [Fact]

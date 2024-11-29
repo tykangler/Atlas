@@ -17,7 +17,7 @@ public class GetPageOptions
     [Option('o', "out", HelpText = "output file to print page ids. prints to console if not specified.")]
     public string? OutFile { get; set; }
 
-    [Option('c', "chunk-size", HelpText = "only valid with --output specified. Writes chunk-size pages per line.", Default = 1)]
+    [Option('c', "chunk-size", HelpText = "only valid with --out specified. Writes chunk-size pages per line.", Default = 1)]
     public int ChunkSize { get; set; }
 
     [Option('p', "page-titles", HelpText = "return page titles instead of page ids", Default = false)]
@@ -66,7 +66,7 @@ public class GetPageOptions
                 .Select(page => PrintTitles ? page.Title : page.PageId.ToString())
                 .Chunk(ChunkSize)
                 .Select(chunk => string.Join(", ", chunk));
-            using var outStream = FileUtilities.CreateFile(OutFile);
+            using var outStream = FileUtilities.CreateOrGetFile(OutFile);
             await PrintLines(outStream, chunkedResult);
         }
         else
