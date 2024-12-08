@@ -1,21 +1,24 @@
 param(
-    [string] $Proto = "../../proto/coreference_resolver.proto",
-    
     [string] $Data,
 
     [string] $DataPath,
 
     [string] $Method,
 
+    [string] $Proto = "../../proto/Narrator/Narrator.proto",
+
+    [string] $ServiceId = "Atlas.Narrator.Narrator",
+    
     [string] $Url = "localhost:50051"
 )
 
 if ($PSBoundParameters.ContainsKey('Data')) {
     $dataToSend = $Data
-} else {
+}
+else {
     $dataToSend = Get-Content $DataPath -Raw
 }
 
-$ServiceId = "Atlas.CoreferenceResolver.CoreferenceResolver"
+$ServiceId = "Atlas.Narrator.Narrator"
 
-grpcurl -proto "$Proto" -plaintext -d "$dataToSend" $Url "$ServiceId/$Method"
+grpcurl -proto $Proto -import-path "../../proto" -plaintext -d "$dataToSend" $Url "$ServiceId/$Method"

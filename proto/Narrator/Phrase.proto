@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+package Atlas.Narrator;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+/* Represents an exact phrase and location. */
+message Phrase {
+
+    // The starting character index of the phrase
+    int32 startIndex = 1;
+
+    // The ending character index of the phrase
+    int32 endIndex = 2;
+
+    // The text of the phrase
+    string text = 3;
+}

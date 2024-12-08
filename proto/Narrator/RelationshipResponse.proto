@@ -1,0 +1,21 @@
+
+syntax = "proto3";
+
+package Atlas.Narrator;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+// Represents the relationship between subject and target.
+message RelationshipResponse {
+
+    // The action that the subject is applying or is getting applied by target.
+    string action = 1;
+
+    // The prepositional qualifier for the action from subject to target or vice versa.
+    string prep = 2;
+
+    // The detailed action text between subject and target.
+    string detailed_action = 3;
+
+    // The object being acted upon.
+    string target = 4;
+}

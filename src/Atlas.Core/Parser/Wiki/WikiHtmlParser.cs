@@ -7,7 +7,7 @@ using Document = Atlas.Core.Model.Document;
 
 namespace Atlas.Core.Parser.Wiki;
 
-public class WikiParser : IParser
+public class WikiHtmlParser : IParser
 {
     private static readonly string[] IgnoreClasses = { "noprint", "hatnote", "reference", "printfooter", "mw-references-wrap", "reflist" };
     private static readonly string[] IgnoreTags = { "style", "cite", "sup", "link", "script", "noscript" };
@@ -15,7 +15,7 @@ public class WikiParser : IParser
     private readonly HtmlParser htmlParser;
     private readonly IEnumerable<IWikiHtmlHandler> htmlHandlers;
 
-    public WikiParser(IEnumerable<IWikiHtmlHandler>? htmlHandlers = null)
+    public WikiHtmlParser(IEnumerable<IWikiHtmlHandler>? htmlHandlers = null)
     {
         htmlParser = new HtmlParser(new HtmlParserOptions
         {

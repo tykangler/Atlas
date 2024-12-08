@@ -47,7 +47,7 @@ public class ParseOptions
 
     private async Task<Document?> ParseContentToDocument()
     {
-        IParser parser = new WikiParser([new LinkHandler(), new SectionHandler(), new TextHandler()]);
+        IParser parser = new WikiHtmlParser(WikiHandlerFactory.Default);
         if (Content == null)
         {
             var apiService = new WikiApiService(new HttpClient());

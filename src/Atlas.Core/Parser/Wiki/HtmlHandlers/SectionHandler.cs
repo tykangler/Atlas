@@ -35,7 +35,7 @@ public class SectionHandler : IWikiHtmlHandler
         var sectionLevelString = element.ClassList
             .Where(cl => cl.StartsWith("mw-heading") && cl[^1].IsDigit())
             .FirstOrDefault();
-        if (sectionLevelString != null && int.TryParse(sectionLevelString, out int sectionLevel))
+        if (sectionLevelString != null && int.TryParse(sectionLevelString[^1].ToString(), out int sectionLevel))
         {
             return sectionLevel;
         }

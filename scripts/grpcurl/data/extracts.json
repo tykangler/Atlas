@@ -1,0 +1,15 @@
+{
+    "text": "A member of the Democratic Party, he was the first African-American president in U.S. history.",
+    "targetPhrases": [
+        {
+            "startIndex": 1,
+            "endIndex": 2,
+            "text": "African-American"
+        },
+        {
+            "startIndex": 1,
+            "endIndex": 2,
+            "text": "Democratic Party"
+        }
+    ]
+}

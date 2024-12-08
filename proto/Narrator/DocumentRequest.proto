@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package Atlas.Narrator;
+
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+import "Narrator/Phrase.proto";
+
+/* The document to find relationships for */
+message DocumentRequest {
+
+    // Search text
+    string text = 1;
+
+    // Phrases to target as relationship targets within the text.
+    repeated Phrase targetPhrases = 2;
+}

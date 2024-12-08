@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+
+package Atlas.Narrator;
+
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+import "Narrator/DocumentRequest.proto";
+import "Narrator/RelationshipResponse.proto";
+
+// Extracts relationships from the given stream of documents and returns a stream of relationships.
+service Narrator {
+    
+    // Extracts relationships from the given stream of documents and returns a stream of relationships.
+    rpc GetRelationships(DocumentRequest) returns (stream RelationshipResponse);
+}
