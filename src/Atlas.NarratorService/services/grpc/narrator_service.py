@@ -14,15 +14,19 @@ class NarratorService(NarratorServicer):
             yield response
 
     def process_extracts(self, requests: Iterator[DocumentRequest]):
-        docs = self.nlp.pipe(ext.text for ext in requests)
+        docs = self.nlp.pipe(req.text for req in requests) # optimize somehow
         for (request, doc) in zip(requests, docs):
             for phrase in request.targetPhrases:
-                target_span = self.get_phrase_span(doc, phrase.text)
-                yield self.evaluate_relationships(target_span)
+                target_span = self.get_phrase_span(doc, phrase.text, phrase.startIndex, phrase.endIndex)
+                if target_span:
+                    yield self.evaluate_relationships(target_span)
 
-    def get_phrase_span(self, doc: Doc, phrase: str):
-        index_found = doc.text.index(phrase)
-        return doc.char_span(index_found, len(phrase) + index_found)
+    def get_phrase_span(self, doc: Doc, phrase: str = "", start_index: int = -1, end_index: int = -1):
+        if start_index != -1 and end_index != -1:
+            return doc.char_span(start_index, end_index)
+        else:
+            index_found = doc.text.index(phrase)
+            return doc.char_span(index_found, len(phrase) + index_found)
 
     def evaluate_relationships(self, span: Span):
         tokens = list(span.subtree)

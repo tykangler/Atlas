@@ -4,6 +4,8 @@ syntax = "proto3";
 package Atlas.Narrator;
 option csharp_namespace = "Atlas.Core.Clients.Generated";
 
+import "Narrator/Phrase.proto";
+
 // Represents the relationship between subject and target.
 message RelationshipResponse {
 

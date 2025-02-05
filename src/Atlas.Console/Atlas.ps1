@@ -1,1 +1,1 @@
-dotnet run -- $Args
+dotnet run --no-build -- $Args

@@ -26,8 +26,16 @@ Refer to the [jupyter notebook](../../lab/relationships.ipynb) for details on im
 
 ## Messaging
 
-This project will use GRPC for communication and messaging. (just to try something new). The gRPC service will take in a stream of `DocumentRequest` and output a stream of `Relationship`. Note 
-that ordering is preserved.
+This project will use GRPC for communication and messaging. (just to try something new). The gRPC service will take in a single `DocumentRequest` and output a stream of `Relationship`. 
+`DocumentRequest` can be either a long document or a document extract. 
+
+### Chunking
+
+We will be sending either:
+1. the entire document (parsed text + phrases)
+2. document chunks (parsed text + phrases)
+
+Let's go with option 2. There's no need to stream the document chunks.
 
 ### Formats
 
@@ -36,20 +44,32 @@ that ordering is preserved.
 ```protobuf
 message DocumentRequest {
     string text = 1;
-    string subject = 2;
-    repeated Phrase targetPhrases = 3;
+    repeated Phrase targetPhrases = 2;
+}
+
+message Phrase {
+    int32 startIndex = 1;
+    int32 endIndex = 2;
+    string text = 3;
 }
 ```
 
 #### Output
 
 ```protobuf
-message Relationship {
-    string subject = 1;
-    string action = 2;
-    string prep = 3;
-    string detailed_action = 4;
-    string target = 5;
+message RelationshipResponse {
+    string action = 1;
+    string prep = 2;
+    string detailed_action = 3;
+    string target = 4;
+}
+```
+
+#### Service Definition
+
+```protobuf
+service Narrator {
+    rpc GetRelationships(DocumentRequest) returns (stream RelationshipResponse);
 }
 ```
 

@@ -1,0 +1,30 @@
+{
+    "text": "A member of the Democratic Party, he was the first African-American president in U.S. history. Obama previously served as a U.S. senator representing Illinois from 2005 to 2008 and as an Illinois state senator from 1997 to 2004.",
+    "targetPhrases": [
+        {
+            "startIndex": -1,
+            "endIndex": -1,
+            "text": "African-American"
+        },
+        {
+            "startIndex": -1,
+            "endIndex": -1,
+            "text": "Democratic Party"
+        },
+        {
+            "startIndex": -1,
+            "endIndex": -1,
+            "text": "U.S. senator"
+        },
+        {
+            "startIndex": -1,
+            "endIndex": -1,
+            "text": "Illinois"
+        },
+        {
+            "startIndex": -1,
+            "endIndex": -1,
+            "text": "Illinois state senator"
+        }
+    ]
+}

@@ -16,4 +16,11 @@ public static class SerializationService
                 new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
             }
         });
+
+    public static T? Deserialize<T>(Stream stream)
+    => JsonSerializer.Deserialize<T>(stream,
+        new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        });
 }
