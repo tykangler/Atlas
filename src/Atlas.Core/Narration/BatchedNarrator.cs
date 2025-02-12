@@ -8,7 +8,7 @@ namespace Atlas.Core.Narration;
 /// <summary>
 /// Makes inferences as to which 
 /// </summary>
-public class BatchedNarrator : INarrator
+public class BatchedNarrator
 {
     private readonly INarratorService narratorService;
 
@@ -28,7 +28,7 @@ public class BatchedNarrator : INarrator
         ));
         await foreach (var relationship in relationships)
         {
-
         }
+        return null;
     }
 }
