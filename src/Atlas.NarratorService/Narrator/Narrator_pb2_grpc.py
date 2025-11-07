@@ -6,7 +6,7 @@ import warnings
 from Narrator import DocumentRequest_pb2 as Narrator_dot_DocumentRequest__pb2
 from Narrator import RelationshipResponse_pb2 as Narrator_dot_RelationshipResponse__pb2
 
-GRPC_GENERATED_VERSION = '1.68.1'
+GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -19,7 +19,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in Narrator/Narrator_pb2_grpc.py depends on'
+        + ' but the generated code in Narrator/Narrator_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
