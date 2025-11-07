@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package Atlas.CoreferenceResolver;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+import "CoreferenceResolver/Mention.proto";
+
+/* Represents a cluster of coreferent mentions. */
+message CorefCluster {
+
+    // All mentions in this coreference cluster
+    repeated Mention mentions = 1;
+
+    // The primary/antecedent mention (typically the first or most specific mention)
+    Mention antecedent = 2;
+}

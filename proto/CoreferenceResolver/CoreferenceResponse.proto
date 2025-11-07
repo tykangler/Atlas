@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package Atlas.CoreferenceResolver;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+import "CoreferenceResolver/CorefCluster.proto";
+
+/* Response containing coreference clusters. */
+message CoreferenceResponse {
+
+    // All coreference clusters found in the text
+    repeated CorefCluster clusters = 1;
+}

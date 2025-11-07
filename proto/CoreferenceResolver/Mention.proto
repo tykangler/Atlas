@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package Atlas.CoreferenceResolver;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+/* Represents a mention in the text that refers to an entity. */
+message Mention {
+
+    // The starting character index of the mention
+    int32 start_char = 1;
+
+    // The ending character index of the mention
+    int32 end_char = 2;
+
+    // The text of the mention
+    string text = 3;
+}

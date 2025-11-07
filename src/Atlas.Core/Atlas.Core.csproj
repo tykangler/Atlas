@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="../../proto/Narrator/*.proto" GrpcServices="Client" AdditionalImportDirs="../../proto" />
+    <Protobuf Include="../../proto/CoreferenceResolver/*.proto" GrpcServices="Client" AdditionalImportDirs="../../proto" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package Atlas.CoreferenceResolver;
+option csharp_namespace = "Atlas.Core.Clients.Generated";
+
+import "CoreferenceResolver/CoreferenceRequest.proto";
+import "CoreferenceResolver/CoreferenceResponse.proto";
+
+/* Resolves coreferences in text, identifying mentions that refer to the same entity. */
+service CoreferenceResolver {
+
+    // Analyzes text and returns coreference clusters
+    rpc ResolveCoreferences(CoreferenceRequest) returns (CoreferenceResponse);
+}
