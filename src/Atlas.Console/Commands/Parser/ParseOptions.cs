@@ -2,13 +2,13 @@ namespace Atlas.Console.Commands.Parser;
 
 using System;
 using Atlas.Console.Services;
-using Atlas.Core.Services;
+using Atlas.Clients.Wiki;
 using CommandLine;
 using Atlas.Console.Exceptions;
-using Atlas.Core.Parser.Wiki;
-using Atlas.Core.Parser;
-using Atlas.Core.Model;
-using Atlas.Core.Parser.Wiki.HtmlHandlers;
+using Atlas.Indexer.Parsing.Wiki;
+using Atlas.Indexer.Parsing;
+using Atlas.Indexer.Models;
+using Atlas.Indexer.Parsing.Wiki.HtmlHandlers;
 
 [Verb("parse-page", HelpText = "Parse a wiki page given either page id, page title, or page content")]
 public class ParseOptions
@@ -50,7 +50,7 @@ public class ParseOptions
         IParser parser = new WikiHtmlParser(WikiHandlerFactory.Default);
         if (Content == null)
         {
-            var apiService = new WikiApiService(new HttpClient());
+            var apiService = new WikiService(new HttpClient());
             var pageContentService = new PageContentService(apiService);
             Console.WriteLine("Sending request to retrieve page");
             var pageContentResponse = await pageContentService.GetPageContent(PageTitle, PageId);

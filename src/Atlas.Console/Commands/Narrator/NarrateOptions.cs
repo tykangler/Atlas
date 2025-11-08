@@ -4,15 +4,15 @@ using System;
 using Atlas.Console.Services;
 using CommandLine;
 using Atlas.Console.Exceptions;
-using Atlas.Core.Clients.Narrator.Models;
+using Atlas.Clients.Narrator.Models;
 using System.Text.Json;
-using Atlas.Core.Model;
-using Atlas.Core.Parser;
-using Atlas.Core.Parser.Wiki;
-using Atlas.Core.Parser.Wiki.HtmlHandlers;
-using Atlas.Core.Services;
-using Atlas.Core.Clients.Narrator;
-using static Atlas.Core.Clients.Generated.Narrator;
+using Atlas.Indexer.Models;
+using Atlas.Indexer.Parsing;
+using Atlas.Indexer.Parsing.Wiki;
+using Atlas.Indexer.Parsing.Wiki.HtmlHandlers;
+using Atlas.Clients.Wiki;
+using Atlas.Clients.Narrator;
+using static Atlas.Clients.Generated.Narrator;
 using Grpc.Net.Client;
 using System.Diagnostics;
 
@@ -76,7 +76,7 @@ public class NarrateOptions
     private async Task<Document?> ParseContentToDocument()
     {
         IParser parser = new WikiHtmlParser(WikiHandlerFactory.Default);
-        var apiService = new WikiApiService(new HttpClient());
+        var apiService = new WikiService(new HttpClient());
         var pageContentService = new PageContentService(apiService);
         Console.WriteLine("Sending request to retrieve page");
         var pageContentResponse = await pageContentService.GetPageContent(PageTitle, PageId);

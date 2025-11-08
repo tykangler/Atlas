@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package Atlas.Narrator;
 
-option csharp_namespace = "Atlas.Core.Clients.Generated";
+option csharp_namespace = "Atlas.Clients.Generated";
 import "Narrator/Phrase.proto";
 
 /* The document to find relationships for */

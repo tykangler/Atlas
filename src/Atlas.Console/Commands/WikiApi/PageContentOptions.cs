@@ -2,7 +2,7 @@ namespace Atlas.Console.Commands.WikiApi;
 
 using System;
 using Atlas.Console.Services;
-using Atlas.Core.Services;
+using Atlas.Clients.Wiki;
 using CommandLine;
 using Atlas.Console.Exceptions;
 
@@ -23,7 +23,7 @@ public class PageContentOptions
 
     public async Task Callback()
     {
-        var apiService = new WikiApiService(new HttpClient());
+        var apiService = new WikiService(new HttpClient());
         var pageContentService = new PageContentService(apiService);
         try
         {

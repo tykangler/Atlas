@@ -3,10 +3,10 @@ namespace Atlas.Console.Commands.WikiApi;
 using System;
 using System.Diagnostics;
 using CommandLine;
-using Atlas.Core.Services;
+using Atlas.Clients.Wiki;
 using Atlas.Core.Exceptions;
 using Atlas.Console.Services;
-using Atlas.Core.Clients.Wiki.Models;
+using Atlas.Clients.Wiki.Models;
 
 [Verb("wiki-get-page", HelpText = "Get Wikipedia page ids")]
 public class GetPageOptions
@@ -25,7 +25,7 @@ public class GetPageOptions
 
     public async Task Callback()
     {
-        var apiService = new WikiApiService(new HttpClient());
+        var apiService = new WikiService(new HttpClient());
         List<WikiPage> allPages = new();
         List<WikiError> warnings = new();
         var stopWatch = Stopwatch.StartNew();

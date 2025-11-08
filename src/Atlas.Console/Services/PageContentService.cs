@@ -1,10 +1,10 @@
 using Atlas.Console.Exceptions;
-using Atlas.Core.Clients.Wiki.Models;
-using Atlas.Core.Services;
+using Atlas.Clients.Wiki.Models;
+using Atlas.Clients.Wiki;
 
 namespace Atlas.Console.Services;
 
-public class PageContentService(WikiApiService apiService)
+public class PageContentService(WikiService apiService)
 {
     public async Task<WikiParseResponse?> GetPageContent(string? pageTitle, string? pageId)
     {
